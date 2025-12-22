@@ -13,5 +13,15 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: bookstore_frontend
+    ports:
+      - "3000:80"  # We map port 3000 on your PC to 80 inside the container
+    depends_on:
+      - backend
+
 volumes:
   postgres_data:
