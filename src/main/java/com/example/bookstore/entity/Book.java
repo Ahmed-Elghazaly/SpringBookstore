@@ -1,0 +1,113 @@
+package com.example.bookstore.entity;
+
+import jakarta.persistence.*;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+@Entity
+@Table(name = "Book")
+public class Book {
+
+    @Id
+    private String isbn;
+
+    @Column(nullable = false)
+    private String title;
+
+    @Column(name = "selling_price", nullable = false, precision = 10, scale = 2)
+    private BigDecimal sellingPrice;
+
+    @Column(name = "stock_quantity", nullable = false)
+    private int stockQuantity;
+
+    @Column(name = "threshold_quantity", nullable = false)
+    private int thresholdQuantity;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "publisher_id", nullable = false)
+    private Publisher publisher;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "category_name", nullable = false)
+    private Category category;
+
+    @OneToMany(mappedBy = "book")
+    private List<AuthorBook> authorBooks;
+
+    @OneToMany(mappedBy = "book")
+    private List<CartBook> cartBooks;
+
+    @OneToMany(mappedBy = "book")
+    private List<PublisherOrderBook> publisherOrderBooks;
+
+    protected Book() {
+        // Required by JPA: used internally via reflection
+    }
+
+    public Book(String isbn, String title, BigDecimal sellingPrice, int stockQuantity, int thresholdQuantity, Publisher publisher, Category category) {
+        this.isbn = isbn;
+        this.title = title;
+        this.sellingPrice = sellingPrice;
+        this.stockQuantity = stockQuantity;
+        this.thresholdQuantity = thresholdQuantity;
+        this.publisher = publisher;
+        this.category = category;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public BigDecimal getSellingPrice() {
+        return sellingPrice;
+    }
+
+    public int getStockQuantity() {
+        return stockQuantity;
+    }
+
+    public int getThresholdQuantity() {
+        return thresholdQuantity;
+    }
+
+    public Publisher getPublisher() {
+        return publisher;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public List<AuthorBook> getAuthorBooks() {
+        return authorBooks;
+    }
+
+    public List<CartBook> getCartBooks() {
+        return cartBooks;
+    }
+
+    public List<PublisherOrderBook> getPublisherOrderBooks() {
+        return publisherOrderBooks;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setSellingPrice(BigDecimal sellingPrice) {
+        this.sellingPrice = sellingPrice;
+    }
+
+    public void setStockQuantity(int stockQuantity) {
+        this.stockQuantity = stockQuantity;
+    }
+
+    public void setThresholdQuantity(int thresholdQuantity) {
+        this.thresholdQuantity = thresholdQuantity;
+    }
+}
