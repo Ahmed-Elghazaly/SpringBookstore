@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -14,14 +15,17 @@ import java.util.Map;
 public interface OrderRepository extends CrudRepository<Order, Long> {
 
     @Query(value = """
-            SELECT c.customer_id AS id, c.first_name AS firstName, c.last_name AS lastName,
-                   c.email AS email, SUM(ob.quantity * ob.price_at_purchase) AS totalSpent
+            SELECT c.customer_id AS "id",
+                   c.first_name AS "firstName",
+                   c.last_name AS "lastName",
+                   c.email AS "email",
+                   SUM(ob.quantity * ob.price_at_purchase) AS "totalSpent"
             FROM customer c
             JOIN "order" o ON c.customer_id = o.customer_id
             JOIN order_book ob ON o.order_id = ob.order_id
             WHERE o.order_date >= CURRENT_DATE - INTERVAL '3 months'
             GROUP BY c.customer_id, c.first_name, c.last_name, c.email
-            ORDER BY totalSpent DESC
+            ORDER BY "totalSpent" DESC
             LIMIT 5
             """, nativeQuery = true)
     List<Map<String, Object>> findTop5CustomersBySpending();
@@ -44,9 +48,12 @@ public interface OrderRepository extends CrudRepository<Order, Long> {
     BigDecimal getTotalSalesPreviousMonth();
 
     @Query(value = """
-            SELECT o.order_id AS orderId, o.order_date AS orderDate,
-                   b.isbn AS isbn, b.title AS title, ob.quantity AS quantity,
-                   ob.price_at_purchase AS priceAtPurchase
+            SELECT o.order_id AS "orderId",
+                   o.order_date AS "orderDate",
+                   b.isbn AS "isbn",
+                   b.title AS "title",
+                   ob.quantity AS "quantity",
+                   ob.price_at_purchase AS "priceAtPurchase"
             FROM "order" o
             JOIN order_book ob ON o.order_id = ob.order_id
             JOIN book b ON ob.book_isbn = b.isbn

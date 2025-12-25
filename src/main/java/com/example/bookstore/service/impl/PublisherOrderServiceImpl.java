@@ -1,11 +1,11 @@
 package com.example.bookstore.service.impl;
 
 import com.example.bookstore.entity.PublisherOrder;
-import com.example.bookstore.repository.BookRepository;
 import com.example.bookstore.repository.PublisherOrderRepository;
 import com.example.bookstore.service.PublisherOrderService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Map;
 
@@ -14,11 +14,10 @@ import java.util.Map;
 public class PublisherOrderServiceImpl implements PublisherOrderService {
 
     private final PublisherOrderRepository publisherOrderRepository;
-    private final BookRepository bookRepository;
 
-    public PublisherOrderServiceImpl(PublisherOrderRepository publisherOrderRepository, BookRepository bookRepository) {
+
+    public PublisherOrderServiceImpl(PublisherOrderRepository publisherOrderRepository) {
         this.publisherOrderRepository = publisherOrderRepository;
-        this.bookRepository = bookRepository;
     }
 
     @Override
@@ -28,10 +27,13 @@ public class PublisherOrderServiceImpl implements PublisherOrderService {
 
     @Override
     public void confirmOrder(Long publisherOrderId) {
-        PublisherOrder order = publisherOrderRepository.findById(publisherOrderId)
-                .orElseThrow(() -> new IllegalArgumentException("Publisher order not found: " + publisherOrderId));
+        PublisherOrder order = publisherOrderRepository.findById(publisherOrderId).orElseThrow(() -> new IllegalArgumentException("Publisher order not found: " + publisherOrderId));
+
+        // 1. Change status in memory
         order.confirm();
-        bookRepository.increaseStock(order.getBook().getIsbn(), order.getQuantity());
+
+
+        // 2. Save the order. This fires the DB trigger, which updates the stock.
         publisherOrderRepository.save(order);
     }
 }

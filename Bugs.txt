@@ -1,0 +1,4 @@
+Better search: ISBN dash, substrings
+Admin Edit Book page: Threshold or stock -ve or threshold less than stock
+Confirm publisher order in admin page date and order number and publisher
+failure to confirm order
