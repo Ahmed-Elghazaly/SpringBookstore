@@ -15,6 +15,9 @@ public class Book {
     @Column(nullable = false)
     private String title;
 
+    @Column(name = "publication_year")
+    private Integer publicationYear;
+
     @Column(name = "selling_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal sellingPrice;
 
@@ -45,9 +48,10 @@ public class Book {
         // Required by JPA: used internally via reflection
     }
 
-    public Book(String isbn, String title, BigDecimal sellingPrice, int stockQuantity, int thresholdQuantity, Publisher publisher, Category category) {
+    public Book(String isbn, String title, Integer publicationYear, BigDecimal sellingPrice, int stockQuantity, int thresholdQuantity, Publisher publisher, Category category) {
         this.isbn = isbn;
         this.title = title;
+        this.publicationYear = publicationYear;
         this.sellingPrice = sellingPrice;
         this.stockQuantity = stockQuantity;
         this.thresholdQuantity = thresholdQuantity;
@@ -109,5 +113,13 @@ public class Book {
 
     public void setThresholdQuantity(int thresholdQuantity) {
         this.thresholdQuantity = thresholdQuantity;
+    }
+
+    public Integer getPublicationYear() {
+        return publicationYear;
+    }
+
+    public void setPublicationYear(Integer publicationYear) {
+        this.publicationYear = publicationYear;
     }
 }

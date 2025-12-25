@@ -1,19 +1,24 @@
 package com.example.bookstore.dto;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public record CartResponse(
         Long cartId,
-        List<CartItem> items
+        List<CartItem> items,
+        BigDecimal totalPrice
 ) {
 
-    public static CartResponse from(Long cartId, List<CartItem> items) {
-        return new CartResponse(cartId, items);
+    public static CartResponse from(Long cartId, List<CartItem> items, BigDecimal totalPrice) {
+        return new CartResponse(cartId, items, totalPrice);
     }
 
     public record CartItem(
             String isbn,
-            int quantity
+            String title,
+            BigDecimal price,
+            int quantity,
+            BigDecimal subtotal
     ) {
     }
 }

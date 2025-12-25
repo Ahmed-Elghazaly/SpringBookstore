@@ -3,12 +3,12 @@ package com.example.bookstore.service.impl;
 import com.example.bookstore.dto.BookResponse;
 import com.example.bookstore.dto.CreateBookRequest;
 import com.example.bookstore.dto.UpdateBookRequest;
+import com.example.bookstore.entity.Author;
+import com.example.bookstore.entity.AuthorBook;
 import com.example.bookstore.exception.BookAlreadyExistsException;
 import com.example.bookstore.exception.BookNotFoundException;
 import com.example.bookstore.mapper.BookMapper;
-import com.example.bookstore.repository.BookRepository;
-import com.example.bookstore.repository.CategoryRepository;
-import com.example.bookstore.repository.PublisherRepository;
+import com.example.bookstore.repository.*;
 import com.example.bookstore.service.BookService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,11 +22,15 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final PublisherRepository publisherRepository;
     private final CategoryRepository categoryRepository;
+    private final AuthorRepository authorRepository;
+    private final AuthorBookRepository authorBookRepository;
 
-    public BookServiceImpl(BookRepository bookRepository, PublisherRepository publisherRepository, CategoryRepository categoryRepository) {
+    public BookServiceImpl(BookRepository bookRepository, PublisherRepository publisherRepository, CategoryRepository categoryRepository, AuthorRepository authorRepository, AuthorBookRepository authorBookRepository) {
         this.bookRepository = bookRepository;
         this.publisherRepository = publisherRepository;
         this.categoryRepository = categoryRepository;
+        this.authorRepository = authorRepository;
+        this.authorBookRepository = authorBookRepository;
     }
 
     @Override
@@ -43,22 +47,28 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookResponse createBook(CreateBookRequest request) {
-        // Business rule: ISBN must be unique
         if (bookRepository.findByIsbn(request.isbn()).isPresent()) {
             throw new BookAlreadyExistsException(request.isbn());
         }
 
-        // Fetch required Publisher
         var publisher = publisherRepository.findById(request.publisherId()).orElseThrow(() -> new RuntimeException("Publisher not found with id " + request.publisherId()));
 
-        // Fetch required Category
         var category = categoryRepository.findById(request.categoryName()).orElseThrow(() -> new RuntimeException("Category not found with name " + request.categoryName()));
 
-        // Create Book entity
-        var book = new com.example.bookstore.entity.Book(request.isbn(), request.title(), request.sellingPrice(), request.stockQuantity(), request.thresholdQuantity(), publisher, category);
-
-        // Persist
+        var book = new com.example.bookstore.entity.Book(request.isbn(), request.title(), request.publicationYear(), request.sellingPrice(), request.stockQuantity(), request.thresholdQuantity(), publisher, category);
         var savedBook = bookRepository.save(book);
+
+        // Handle authors
+        if (request.authorNames() != null && !request.authorNames().isEmpty()) {
+            for (String authorName : request.authorNames()) {
+                // Find or create author
+                Author author = authorRepository.findByName(authorName).orElseGet(() -> authorRepository.save(new Author(authorName)));
+
+                // Create the relationship
+                AuthorBook authorBook = new AuthorBook(author, savedBook);
+                authorBookRepository.save(authorBook);
+            }
+        }
 
         return BookMapper.toResponse(savedBook);
     }
@@ -100,9 +110,8 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookResponse> searchBooks(String title, String category, String author, String publisher) {
-        var books = bookRepository.findBooksDynamic(title, category, publisher, author);
-
+    public List<BookResponse> searchBooks(String isbn, String title, String category, String author, String publisher) {
+        var books = bookRepository.findBooksDynamic(isbn, title, category, publisher, author);
         return books.stream().map(BookMapper::toResponse).toList();
     }
 

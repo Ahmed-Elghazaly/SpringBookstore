@@ -1,23 +1,36 @@
 package com.example.bookstore.controller;
 
-import com.example.bookstore.entity.Customer;
-import com.example.bookstore.repository.CustomerRepository;
+import com.example.bookstore.dto.CreateCustomerRequest;
+import com.example.bookstore.dto.CustomerResponse;
+import com.example.bookstore.dto.UpdateCustomerRequest;
+import com.example.bookstore.service.CustomerService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/customers")
+@RequestMapping("/api/customers")
 public class CustomerController {
 
-    private final CustomerRepository customerRepository;
+    private final CustomerService customerService;
 
-    public CustomerController(CustomerRepository customerRepository) {
-        this.customerRepository = customerRepository;
+    public CustomerController(CustomerService customerService) {
+        this.customerService = customerService;
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Customer register(@RequestBody Customer customer) {
-        return customerRepository.save(customer);
+    public CustomerResponse register(@Valid @RequestBody CreateCustomerRequest request) {
+        return customerService.register(request);
+    }
+
+    @PutMapping("/{customerId}")
+    public CustomerResponse updateCustomer(@PathVariable Long customerId, @Valid @RequestBody UpdateCustomerRequest request) {
+        return customerService.updateCustomer(customerId, request);
+    }
+
+    @GetMapping("/{customerId}")
+    public CustomerResponse getCustomer(@PathVariable Long customerId) {
+        return customerService.getCustomer(customerId);
     }
 }

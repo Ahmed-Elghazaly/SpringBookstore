@@ -25,6 +25,7 @@ public interface OrderRepository extends CrudRepository<com.example.bookstore.en
             FROM customer c
             JOIN "Order" o ON c.customer_id = o.customer_id
             JOIN order_book ob ON o.order_id = ob.order_id
+            WHERE o.order_date >= CURRENT_DATE - INTERVAL '3 months'
             GROUP BY c.customer_id, c.first_name, c.last_name
             ORDER BY "totalSpent" DESC
             LIMIT 5
@@ -72,4 +73,11 @@ public interface OrderRepository extends CrudRepository<com.example.bookstore.en
             ORDER BY o.order_date DESC, o.order_id DESC
             """, nativeQuery = true)
     List<Map<String, Object>> findOrderHistoryByCustomerId(@Param("customerId") Long customerId);
+
+    @Query(value = """
+            SELECT COUNT(*)
+            FROM Publisher_Order_Book
+            WHERE book_isbn = :isbn
+            """, nativeQuery = true)
+    Long countPublisherOrdersForBook(@Param("isbn") String isbn);
 }

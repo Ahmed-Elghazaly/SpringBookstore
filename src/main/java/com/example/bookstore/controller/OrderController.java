@@ -1,11 +1,13 @@
 package com.example.bookstore.controller;
 
+import com.example.bookstore.dto.CheckoutRequest;
 import com.example.bookstore.service.OrderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -19,15 +21,6 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    /**
-     * Checkout endpoint.
-     * Converts the customer's shopping cart into an order.
-     */
-    @PostMapping("/checkout/{customerId}")
-    public ResponseEntity<Map<String, Long>> checkout(@PathVariable Long customerId) {
-        Long orderId = orderService.checkout(customerId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("orderId", orderId));
-    }
 
     /**
      * Customer: View all past orders with details.
@@ -63,5 +56,26 @@ public class OrderController {
     @GetMapping("/reports/sales/prev-month")
     public ResponseEntity<BigDecimal> getTotalSalesPreviousMonth() {
         return ResponseEntity.ok(orderService.getTotalSalesPreviousMonth());
+    }
+
+    @GetMapping("/reports/publisher-orders/{isbn}")
+    public ResponseEntity<Long> getPublisherOrderCount(@PathVariable String isbn) {
+        return ResponseEntity.ok(orderService.getPublisherOrderCountForBook(isbn));
+    }
+
+    @PostMapping("/checkout/{customerId}")
+    public ResponseEntity<Map<String, Object>> checkout(@PathVariable Long customerId, @RequestBody CheckoutRequest request) {
+
+        // Simple credit card validation
+        if (request.creditCardNumber() == null || request.creditCardNumber().length() < 13) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid credit card number"));
+        }
+
+        if (request.expiryDate() == null || request.expiryDate().isBefore(LocalDate.now())) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Credit card has expired"));
+        }
+
+        Long orderId = orderService.checkout(customerId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("orderId", orderId, "message", "Order placed successfully"));
     }
 }

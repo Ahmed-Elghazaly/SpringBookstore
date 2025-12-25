@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { orderApi } from '../api/client';
+import {useEffect, useState} from 'react';
+import {orderApi} from '../api/client';
 
 export default function OrderHistory() {
     const [orders, setOrders] = useState([]);

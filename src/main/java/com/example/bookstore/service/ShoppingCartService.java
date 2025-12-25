@@ -12,4 +12,6 @@ public interface ShoppingCartService {
     CartResponse updateBookQuantity(Long customerId, String isbn, int quantity);
 
     CartResponse removeBookFromCart(Long customerId, String isbn);
+
+    void clearCart(Long customerId);
 }

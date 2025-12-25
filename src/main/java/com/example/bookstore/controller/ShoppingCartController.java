@@ -3,6 +3,7 @@ package com.example.bookstore.controller;
 import com.example.bookstore.dto.CartItemRequest;
 import com.example.bookstore.dto.CartResponse;
 import com.example.bookstore.service.ShoppingCartService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -52,5 +53,11 @@ public class ShoppingCartController {
             @PathVariable Long customerId,
             @PathVariable String isbn) {
         return shoppingCartService.removeBookFromCart(customerId, isbn);
+    }
+
+    @DeleteMapping("/{customerId}/clear")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void clearCart(@PathVariable Long customerId) {
+        shoppingCartService.clearCart(customerId);
     }
 }

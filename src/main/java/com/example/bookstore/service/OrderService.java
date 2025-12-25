@@ -21,4 +21,6 @@ public interface OrderService {
     BigDecimal getTotalSalesPreviousMonth();
 
     List<Map<String, Object>> getCustomerOrderHistory(Long customerId);
+
+    Long getPublisherOrderCountForBook(String isbn);
 }

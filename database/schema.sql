@@ -65,8 +65,8 @@ CREATE TABLE Customer
     password         VARCHAR(255)        NOT NULL,
     first_name       VARCHAR(100)        NOT NULL,
     last_name        VARCHAR(100)        NOT NULL,
-    email            VARCHAR(255) UNIQUE NOT NULL CHECK (POSITION('@' IN email) > 1),
-    phone            VARCHAR(50),
+    email            VARCHAR(255) UNIQUE NOT NULL,
+    phone_number     VARCHAR(50),
     shipping_address VARCHAR(500)        NOT NULL
 );
 
@@ -132,27 +132,24 @@ CREATE TABLE Cart_Book
 -- ============================
 -- TABLE: PublisherOrder
 -- ============================
-CREATE TYPE order_status AS ENUM ('Pending', 'Confirmed', 'Cancelled');
-
 CREATE TABLE PublisherOrder
 (
     publisher_order_id SERIAL PRIMARY KEY,
-    admin_id           INTEGER      NOT NULL,
-    publisher_id       INTEGER      NOT NULL,
-    order_date         DATE         NOT NULL,
-    order_quantity     INTEGER      NOT NULL CHECK (order_quantity >= 1),
-    status             order_status NOT NULL,
-    FOREIGN KEY (admin_id) REFERENCES Admin (admin_id),
-    FOREIGN KEY (publisher_id) REFERENCES Publisher (publisher_id)
+    order_date         DATE        NOT NULL,
+    order_quantity     INTEGER     NOT NULL CHECK (order_quantity >= 1),
+    status             VARCHAR(50) NOT NULL DEFAULT 'Pending',
+    CHECK (status IN ('Pending', 'Confirmed', 'Cancelled'))
 );
 
 -- ============================
 -- RELATIONSHIP TABLE: PublisherOrder_Book
 -- ============================
-CREATE TABLE PublisherOrder_Book
+CREATE TABLE Publisher_Order_Book
 (
-    publisher_order_id INTEGER     NOT NULL,
-    book_isbn          VARCHAR(20) NOT NULL,
+    publisher_order_id INTEGER        NOT NULL,
+    book_isbn          VARCHAR(20)    NOT NULL,
+    quantity           INTEGER        NOT NULL CHECK (quantity >= 1),
+    price_at_order     NUMERIC(12, 2) NOT NULL CHECK (price_at_order >= 0),
     PRIMARY KEY (publisher_order_id, book_isbn),
     FOREIGN KEY (publisher_order_id) REFERENCES PublisherOrder (publisher_order_id),
     FOREIGN KEY (book_isbn) REFERENCES Book (isbn)

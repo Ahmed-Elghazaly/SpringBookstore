@@ -1,49 +1,141 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, User, LogOut, BarChart3 } from 'lucide-react';
+import {Link, useNavigate} from 'react-router-dom';
+import api from '../api/client';
+import {BookOpen, LayoutDashboard, LogOut, ShoppingCart, User, Package, BookMarked} from 'lucide-react';
 
 export default function Navbar() {
     const navigate = useNavigate();
-    const customerId = localStorage.getItem('customerId');
+    // Get the current user from localStorage (set during login)
+    const user = JSON.parse(localStorage.getItem('user'));
 
-    const handleLogout = () => {
+    // Handles user logout:
+    // 1. Clears the customer's cart via API (so they start fresh next login)
+    // 2. Removes user data from localStorage
+    // 3. Redirects to the login page
+    const handleLogout = async () => {
+        const customerId = localStorage.getItem('customerId');
+        if (customerId) {
+            try {
+                // Clear the cart on the server side
+                await api.delete(`/cart/${customerId}/clear`);
+            } catch (err) {
+                console.error("Failed to clear cart on logout:", err);
+            }
+        }
+        // Remove all stored user data
+        localStorage.removeItem('user');
         localStorage.removeItem('customerId');
+        // Redirect to login page
         navigate('/login');
     };
+
+    // Don't render the navbar if no user is logged in
+    if (!user) return null;
 
     return (
         <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16">
-                    <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
+                    {/* Logo/Brand - clicking navigates to home (different for admin vs customer) */}
+                    <div 
+                        className="flex items-center cursor-pointer" 
+                        onClick={() => navigate(user.role === 'ADMIN' ? '/admin' : '/')}
+                    >
                         <span className="text-2xl font-bold text-brand-600">GoldenBooks</span>
+                        {/* Show ADMIN badge for admin users */}
+                        {user.role === 'ADMIN' && (
+                            <span className="ml-2 px-2 py-0.5 rounded text-xs bg-red-100 text-red-600 font-bold border border-red-200">
+                                ADMIN
+                            </span>
+                        )}
                     </div>
 
+                    {/* Navigation Links */}
                     <div className="flex items-center space-x-6">
-                        {customerId ? (
+
+                        {/* ==================== CUSTOMER LINKS ==================== */}
+                        {user.role === 'CUSTOMER' && (
                             <>
-                                <Link to="/" className="text-gray-600 hover:text-brand-600 font-medium">Browse</Link>
-                                <Link to="/orders" className="text-gray-600 hover:text-brand-600 font-medium">Orders</Link>
-                                <Link to="/admin" className="text-gray-600 hover:text-brand-600 font-medium flex items-center gap-1">
-                                    <BarChart3 size={18} /> Admin
+                                {/* Browse books link */}
+                                <Link 
+                                    to="/" 
+                                    className="text-gray-600 hover:text-brand-600 font-medium flex items-center gap-1"
+                                >
+                                    <BookOpen size={18}/> Browse
                                 </Link>
-
-                                <Link to="/cart" className="relative text-gray-600 hover:text-brand-600">
-                                    <ShoppingCart size={24} />
-                                    {/* Badge could go here if we tracked count globally */}
+                                
+                                {/* Order history link */}
+                                <Link 
+                                    to="/orders" 
+                                    className="text-gray-600 hover:text-brand-600 font-medium"
+                                >
+                                    My Orders
                                 </Link>
-
-                                <div className="h-6 w-px bg-gray-300 mx-2"></div>
-
-                                <div className="flex items-center gap-3">
-                                    <span className="text-sm font-semibold text-gray-700">User #{customerId}</span>
-                                    <button onClick={handleLogout} className="text-red-500 hover:bg-red-50 p-2 rounded-full">
-                                        <LogOut size={20} />
-                                    </button>
-                                </div>
+                                
+                                {/* Profile link - allows customers to edit their information */}
+                                <Link 
+                                    to="/profile" 
+                                    className="text-gray-600 hover:text-brand-600 font-medium flex items-center gap-1"
+                                >
+                                    <User size={18}/> Profile
+                                </Link>
+                                
+                                {/* Shopping cart link */}
+                                <Link 
+                                    to="/cart" 
+                                    className="relative text-gray-600 hover:text-brand-600"
+                                >
+                                    <ShoppingCart size={24}/>
+                                </Link>
                             </>
-                        ) : (
-                            <Link to="/login" className="text-brand-600 font-bold">Login</Link>
                         )}
+
+                        {/* ==================== ADMIN LINKS ==================== */}
+                        {user.role === 'ADMIN' && (
+                            <>
+                                {/* Reports dashboard link */}
+                                <Link 
+                                    to="/admin" 
+                                    className="text-gray-600 hover:text-brand-600 font-medium flex items-center gap-1"
+                                >
+                                    <LayoutDashboard size={18}/> Reports
+                                </Link>
+                                
+                                {/* Book management link - add/edit books */}
+                                <Link 
+                                    to="/admin/books" 
+                                    className="text-gray-600 hover:text-brand-600 font-medium flex items-center gap-1"
+                                >
+                                    <BookMarked size={18}/> Manage Books
+                                </Link>
+                                
+                                {/* Publisher orders link - confirm pending orders to add stock */}
+                                <Link 
+                                    to="/admin/publisher-orders" 
+                                    className="text-gray-600 hover:text-brand-600 font-medium flex items-center gap-1"
+                                >
+                                    <Package size={18}/> Publisher Orders
+                                </Link>
+                            </>
+                        )}
+
+                        {/* Divider */}
+                        <div className="h-6 w-px bg-gray-300 mx-2"></div>
+
+                        {/* User info and logout */}
+                        <div className="flex items-center gap-3">
+                            {/* Display the user's name */}
+                            <span className="text-sm font-semibold text-gray-700 hidden sm:block">
+                                {user.name}
+                            </span>
+                            {/* Logout button */}
+                            <button 
+                                onClick={handleLogout} 
+                                className="text-red-500 hover:bg-red-50 p-2 rounded-full"
+                                title="Logout"
+                            >
+                                <LogOut size={20}/>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

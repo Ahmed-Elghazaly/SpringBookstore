@@ -50,6 +50,8 @@ public interface OrderBookRepository extends Repository<com.example.bookstore.en
                 SUM(ob.quantity)  AS total_sold
             FROM Order_Book ob
             JOIN Book b ON b.isbn = ob.book_isbn
+            JOIN "Order" o ON o.order_id = ob.order_id
+            WHERE o.order_date >= CURRENT_DATE - INTERVAL '3 months'
             GROUP BY b.isbn, b.title
             ORDER BY total_sold DESC
             LIMIT 10

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/books")
+@RequestMapping("/api/books")
 public class BookController {
 
 
@@ -48,8 +48,9 @@ public class BookController {
     }
 
     @GetMapping("/search")
-    public List<BookResponse> searchBooks(@RequestParam(required = false) String title, @RequestParam(required = false) String category, @RequestParam(required = false) String author, @RequestParam(required = false) String publisher) {
-        return bookService.searchBooks(title, category, author, publisher);
+    public List<BookResponse> searchBooks(@RequestParam(required = false) String isbn,      // ADD THIS
+                                          @RequestParam(required = false) String title, @RequestParam(required = false) String category, @RequestParam(required = false) String author, @RequestParam(required = false) String publisher) {
+        return bookService.searchBooks(isbn, title, category, author, publisher);  // ADD isbn
     }
 
     @DeleteMapping("/{isbn}")

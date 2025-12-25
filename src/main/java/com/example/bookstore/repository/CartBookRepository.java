@@ -1,13 +1,18 @@
 package com.example.bookstore.repository;
 
+import com.example.bookstore.entity.CartBook;
+import com.example.bookstore.entity.CartBookId;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 @org.springframework.stereotype.Repository
-public interface CartBookRepository extends Repository<Object, Long> {
+public interface CartBookRepository extends Repository<CartBook, CartBookId> {
 
     /**
      * Insert a book into the cart.
@@ -51,26 +56,32 @@ public interface CartBookRepository extends Repository<Object, Long> {
             """, nativeQuery = true)
     void removeBook(@Param("cartId") Long cartId, @Param("isbn") String isbn);
 
-    /**
-     * Fetch all items in a cart.
-     * Read-only SQL.
-     */
-    @Query(
-            value = """
-                    SELECT book_isbn AS isbn,
-                           quantity
-                    FROM Cart_Book
-                    WHERE cart_id = :cartId
-                    """,
-            nativeQuery = true
-    )
-    java.util.List<CartItemRow> findItemsByCartId(@Param("cartId") Long cartId);
+    @Query(value = """
+            SELECT 
+                b.isbn AS isbn,
+                b.title AS title,
+                b.selling_price AS price,
+                cb.quantity AS quantity
+            FROM Cart_Book cb
+            JOIN Book b ON cb.book_isbn = b.isbn
+            WHERE cb.cart_id = :cartId
+            """, nativeQuery = true)
+    List<CartItemRow> findItemsByCartId(@Param("cartId") Long cartId);
 
-    /**
-     * Projection interface for cart items.
-     */
+    @Modifying
+    @Transactional
+    @Query(value = """
+            DELETE FROM Cart_Book
+            WHERE cart_id = :cartId
+            """, nativeQuery = true)
+    void clearCart(@Param("cartId") Long cartId);
+
     interface CartItemRow {
         String getIsbn();
+
+        String getTitle();
+
+        BigDecimal getPrice();
 
         int getQuantity();
     }
