@@ -62,6 +62,6 @@ public interface OrderRepository extends CrudRepository<Order, Long> {
             """, nativeQuery = true)
     List<Map<String, Object>> findOrderHistoryByCustomerId(@Param("customerId") Long customerId);
 
-    @Query(value = "SELECT COUNT(*) FROM publisher_order WHERE book_isbn = :isbn", nativeQuery = true)
+    @Query(value = "SELECT COUNT(*) FROM publisher_order WHERE book_isbn = :isbn AND status = 'Confirmed'", nativeQuery = true)
     Long countPublisherOrdersForBook(@Param("isbn") String isbn);
 }
