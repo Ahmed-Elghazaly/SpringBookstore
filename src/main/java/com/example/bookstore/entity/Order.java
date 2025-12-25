@@ -1,19 +1,23 @@
 package com.example.bookstore.entity;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "\"Order\"")
+@Table(name = "\"order\"")
 public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "order_id")
     private Long orderId;
 
-    @Column(nullable = false)
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
+
+    @Column(name = "order_date", nullable = false)
     private LocalDate orderDate;
 
     @OneToMany(mappedBy = "order")
@@ -21,37 +25,19 @@ public class Order {
 
     protected Order() {
     }
+
     public Order(Customer customer, LocalDate orderDate) {
         this.customer = customer;
         this.orderDate = orderDate;
     }
-    public Order(LocalDate orderDate) {
-        this.orderDate = orderDate;
-    }
 
-    public Long getOrderId() {
-        return orderId;
-    }
+    // Getters
+    public Long getOrderId() { return orderId; }
+    public Customer getCustomer() { return customer; }
+    public LocalDate getOrderDate() { return orderDate; }
+    public List<OrderBook> getOrderBooks() { return orderBooks; }
 
-    public LocalDate getOrderDate() {
-        return orderDate;
-    }
-
-    public List<OrderBook> getOrderBooks() {
-        return orderBooks;
-    }
-
-    // Add this field inside Order class
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "customer_id", nullable = false)
-    private Customer customer;
-
-    // Add this setter
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
+    // Setters
+    public void setCustomer(Customer customer) { this.customer = customer; }
+    public void setOrderDate(LocalDate orderDate) { this.orderDate = orderDate; }
 }

@@ -1,18 +1,20 @@
 package com.example.bookstore.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-
 import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
 public class AuthorBookId implements Serializable {
 
+    @Column(name = "author_id")
     private Long authorId;
+
+    @Column(name = "book_isbn")
     private String bookIsbn;
 
     protected AuthorBookId() {
-        // required by JPA
     }
 
     public AuthorBookId(Long authorId, String bookIsbn) {
@@ -32,8 +34,7 @@ public class AuthorBookId implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof AuthorBookId that)) return false;
-        return Objects.equals(authorId, that.authorId)
-                && Objects.equals(bookIsbn, that.bookIsbn);
+        return Objects.equals(authorId, that.authorId) && Objects.equals(bookIsbn, that.bookIsbn);
     }
 
     @Override

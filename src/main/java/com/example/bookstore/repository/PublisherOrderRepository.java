@@ -4,23 +4,16 @@ import com.example.bookstore.entity.PublisherOrder;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Map;
 
 @Repository
 public interface PublisherOrderRepository extends JpaRepository<PublisherOrder, Long> {
 
-    // Find all pending orders with book and publisher details
     @Query(value = """
-            SELECT 
-                po.publisher_order_id AS "orderId",
-                po.order_date AS "orderDate",
-                po.quantity AS "quantity",
-                po.status AS "status",
-                b.isbn AS "isbn",
-                b.title AS "bookTitle",
-                p.name AS "publisherName"
+            SELECT po.publisher_order_id AS orderId, po.order_date AS orderDate,
+                   po.quantity AS quantity, po.status AS status,
+                   b.isbn AS isbn, b.title AS bookTitle, p.name AS publisherName
             FROM publisher_order po
             JOIN book b ON po.book_isbn = b.isbn
             JOIN publisher p ON b.publisher_id = p.publisher_id
@@ -28,10 +21,4 @@ public interface PublisherOrderRepository extends JpaRepository<PublisherOrder, 
             ORDER BY po.order_date DESC
             """, nativeQuery = true)
     List<Map<String, Object>> findPendingOrdersWithDetails();
-
-    // Count orders for a specific book
-    @Query(value = """
-            SELECT COUNT(*) FROM publisher_order WHERE book_isbn = :isbn
-            """, nativeQuery = true)
-    Long countOrdersForBook(String isbn);
 }

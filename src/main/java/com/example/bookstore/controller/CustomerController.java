@@ -18,19 +18,19 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
-    @PostMapping
+    @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public CustomerResponse register(@Valid @RequestBody CreateCustomerRequest request) {
         return customerService.register(request);
     }
 
-    @PutMapping("/{customerId}")
-    public CustomerResponse updateCustomer(@PathVariable Long customerId, @Valid @RequestBody UpdateCustomerRequest request) {
-        return customerService.updateCustomer(customerId, request);
+    @GetMapping("/{customerId}")
+    public CustomerResponse getProfile(@PathVariable Long customerId) {
+        return customerService.getProfile(customerId);
     }
 
-    @GetMapping("/{customerId}")
-    public CustomerResponse getCustomer(@PathVariable Long customerId) {
-        return customerService.getCustomer(customerId);
+    @PutMapping("/{customerId}")
+    public CustomerResponse updateProfile(@PathVariable Long customerId, @Valid @RequestBody UpdateCustomerRequest request) {
+        return customerService.updateProfile(customerId, request);
     }
 }

@@ -25,26 +25,20 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponse login(LoginRequest req) {
         if ("ADMIN".equalsIgnoreCase(req.role())) {
-            // 1. Check Admin Table
-            Admin admin = adminRepo.findByUsername(req.username()).orElseThrow(() -> new RuntimeException("Admin not found"));
-
-            // 2. Validate Password (Plain text for this project)
+            Admin admin = adminRepo.findByUsername(req.username())
+                    .orElseThrow(() -> new RuntimeException("Admin not found"));
             if (!admin.getPassword().equals(req.password())) {
                 throw new RuntimeException("Invalid credentials");
             }
-
-            return new AuthResponse(admin.getAdminId(), admin.getUsername(), "ADMIN", admin.getName());
-
+            return new AuthResponse(admin.getAdminId(), admin.getUsername(), admin.getName(), "ADMIN");
         } else {
-            // 1. Check Customer Table
-            Customer cust = customerRepo.findByUsername(req.username()).orElseThrow(() -> new RuntimeException("Customer not found"));
-
-            // 2. Validate Password
-            if (!cust.getPassword().equals(req.password())) {
+            Customer customer = customerRepo.findByUsername(req.username())
+                    .orElseThrow(() -> new RuntimeException("Customer not found"));
+            if (!customer.getPassword().equals(req.password())) {
                 throw new RuntimeException("Invalid credentials");
             }
-
-            return new AuthResponse(cust.getCustomerId(), cust.getUsername(), "CUSTOMER", cust.getFirstName());
+            String fullName = customer.getFirstName() + " " + customer.getLastName();
+            return new AuthResponse(customer.getCustomerId(), customer.getUsername(), fullName, "CUSTOMER");
         }
     }
 }

@@ -15,116 +15,109 @@ export default function Navbar() {
         const customerId = localStorage.getItem('customerId');
         if (customerId) {
             try {
-                // Clear the cart on the server side
-                await api.delete(`/cart/${customerId}/clear`);
+                // FIX: Backend path is DELETE /api/cart/{customerId}
+                // (No /clear at the end)
+                await api.delete(`/cart/${customerId}`);
             } catch (err) {
                 console.error("Failed to clear cart on logout:", err);
             }
         }
-        // Remove all stored user data
         localStorage.removeItem('user');
         localStorage.removeItem('customerId');
-        // Redirect to login page
         navigate('/login');
     };
 
     // Don't render the navbar if no user is logged in
     if (!user) return null;
 
-    return (
-        <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
+    return (<nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16">
                     {/* Logo/Brand - clicking navigates to home (different for admin vs customer) */}
-                    <div 
-                        className="flex items-center cursor-pointer" 
+                    <div
+                        className="flex items-center cursor-pointer"
                         onClick={() => navigate(user.role === 'ADMIN' ? '/admin' : '/')}
                     >
                         <span className="text-2xl font-bold text-brand-600">GoldenBooks</span>
                         {/* Show ADMIN badge for admin users */}
-                        {user.role === 'ADMIN' && (
-                            <span className="ml-2 px-2 py-0.5 rounded text-xs bg-red-100 text-red-600 font-bold border border-red-200">
+                        {user.role === 'ADMIN' && (<span
+                                className="ml-2 px-2 py-0.5 rounded text-xs bg-red-100 text-red-600 font-bold border border-red-200">
                                 ADMIN
-                            </span>
-                        )}
+                            </span>)}
                     </div>
 
                     {/* Navigation Links */}
                     <div className="flex items-center space-x-4">
 
                         {/* ==================== CUSTOMER LINKS ==================== */}
-                        {user.role === 'CUSTOMER' && (
-                            <>
+                        {user.role === 'CUSTOMER' && (<>
                                 {/* Browse books link */}
-                                <Link 
-                                    to="/" 
+                                <Link
+                                    to="/"
                                     className="text-gray-600 hover:text-brand-600 font-medium flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-gray-100"
                                 >
                                     <BookOpen size={18}/> Browse
                                 </Link>
-                                
+
                                 {/* Order history link */}
-                                <Link 
-                                    to="/orders" 
+                                <Link
+                                    to="/orders"
                                     className="text-gray-600 hover:text-brand-600 font-medium px-3 py-2 rounded-lg hover:bg-gray-100"
                                 >
                                     My Orders
                                 </Link>
-                                
+
                                 {/* Profile link */}
-                                <Link 
-                                    to="/profile" 
+                                <Link
+                                    to="/profile"
                                     className="text-gray-600 hover:text-brand-600 font-medium flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-gray-100"
                                 >
                                     <User size={18}/> Profile
                                 </Link>
-                                
+
                                 {/* Shopping cart link */}
-                                <Link 
-                                    to="/cart" 
+                                <Link
+                                    to="/cart"
                                     className="relative text-gray-600 hover:text-brand-600 p-2 rounded-lg hover:bg-gray-100"
                                 >
                                     <ShoppingCart size={24}/>
                                 </Link>
-                            </>
-                        )}
+                            </>)}
 
                         {/* ==================== ADMIN LINKS ==================== */}
-                        {user.role === 'ADMIN' && (
-                            <>
+                        {user.role === 'ADMIN' && (<>
                                 {/* Reports dashboard link */}
-                                <Link 
-                                    to="/admin" 
+                                <Link
+                                    to="/admin"
                                     className="text-gray-600 hover:text-brand-600 font-medium flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-gray-100"
                                 >
                                     <LayoutDashboard size={18}/> Reports
                                 </Link>
-                                
+
                                 {/* Book management link */}
-                                <Link 
-                                    to="/admin/books" 
+                                <Link
+                                    to="/admin/books"
                                     className="text-gray-600 hover:text-brand-600 font-medium flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-gray-100"
                                 >
                                     <BookMarked size={18}/> Books
                                 </Link>
-                                
+
                                 {/* Publisher orders link */}
-                                <Link 
-                                    to="/admin/publisher-orders" 
+                                <Link
+                                    to="/admin/publisher-orders"
                                     className="text-gray-600 hover:text-brand-600 font-medium flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-gray-100"
                                 >
                                     <Package size={18}/> Orders
                                 </Link>
-                                
+
                                 {/* Settings link - Manage Publishers & Categories */}
-                                <Link 
-                                    to="/admin/settings" 
+                                <Link
+                                    to="/admin/settings"
                                     className="text-gray-600 hover:text-brand-600 font-medium flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-gray-100"
                                 >
                                     <Settings size={18}/> Settings
                                 </Link>
-                            </>
-                        )}
+                            </>)}
 
                         {/* Divider */}
                         <div className="h-6 w-px bg-gray-300 mx-2"></div>
@@ -136,8 +129,8 @@ export default function Navbar() {
                                 {user.name}
                             </span>
                             {/* Logout button */}
-                            <button 
-                                onClick={handleLogout} 
+                            <button
+                                onClick={handleLogout}
                                 className="text-red-500 hover:bg-red-50 p-2 rounded-full"
                                 title="Logout"
                             >
@@ -147,6 +140,5 @@ export default function Navbar() {
                     </div>
                 </div>
             </div>
-        </nav>
-    );
+        </nav>);
 }

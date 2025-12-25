@@ -6,20 +6,17 @@ import com.example.bookstore.dto.UpdateBookRequest;
 import com.example.bookstore.service.BookService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/books")
 public class BookController {
 
-
     private final BookService bookService;
 
     public BookController(BookService bookService) {
         this.bookService = bookService;
     }
-
 
     @GetMapping
     public List<BookResponse> getAllBooks() {
@@ -48,9 +45,14 @@ public class BookController {
     }
 
     @GetMapping("/search")
-    public List<BookResponse> searchBooks(@RequestParam(required = false) String isbn,      // ADD THIS
-                                          @RequestParam(required = false) String title, @RequestParam(required = false) String category, @RequestParam(required = false) String publisher, @RequestParam(required = false) String author) {
-        return bookService.searchBooks(isbn, title, category, publisher, author);  // ADD isbn
+    public List<BookResponse> searchBooks(
+            @RequestParam(required = false) String isbn,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String publisher,
+            @RequestParam(required = false) String author
+    ) {
+        return bookService.searchBooks(isbn, title, category, publisher, author);
     }
 
     @DeleteMapping("/{isbn}")

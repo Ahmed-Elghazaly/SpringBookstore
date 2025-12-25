@@ -3,11 +3,12 @@ package com.example.bookstore.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Customer")
+@Table(name = "customer")
 public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "customer_id")
     private Long customerId;
 
     @Column(nullable = false, unique = true)
@@ -25,17 +26,17 @@ public class Customer {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(nullable = false)
+    @Column(name = "shipping_address", nullable = false)
     private String shippingAddress;
 
-    @Column
+    @Column(name = "phone_number")
     private String phoneNumber;
 
     protected Customer() {
     }
 
-
-    public Customer(String username, String password, String email, String firstName, String lastName, String shippingAddress, String phoneNumber) {
+    public Customer(String username, String password, String email, String firstName, 
+                    String lastName, String shippingAddress, String phoneNumber) {
         this.username = username;
         this.password = password;
         this.email = email;
@@ -45,59 +46,21 @@ public class Customer {
         this.phoneNumber = phoneNumber;
     }
 
-    public Long getCustomerId() {
-        return customerId;
-    }
+    // Getters
+    public Long getCustomerId() { return customerId; }
+    public String getUsername() { return username; }
+    public String getPassword() { return password; }
+    public String getEmail() { return email; }
+    public String getFirstName() { return firstName; }
+    public String getLastName() { return lastName; }
+    public String getShippingAddress() { return shippingAddress; }
+    public String getPhoneNumber() { return phoneNumber; }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getShippingAddress() {
-        return shippingAddress;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public void setShippingAddress(String shippingAddress) {
-        this.shippingAddress = shippingAddress;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
+    // Setters
+    public void setPassword(String password) { this.password = password; }
+    public void setEmail(String email) { this.email = email; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
+    public void setShippingAddress(String shippingAddress) { this.shippingAddress = shippingAddress; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
 }

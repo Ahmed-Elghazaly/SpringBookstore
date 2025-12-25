@@ -16,46 +16,28 @@ public class ShoppingCartController {
         this.shoppingCartService = shoppingCartService;
     }
 
-    /**
-     * Get the current shopping cart for a customer.
-     */
     @GetMapping("/{customerId}")
     public CartResponse getCart(@PathVariable Long customerId) {
         return shoppingCartService.getCart(customerId);
     }
 
-    /**
-     * Add a book to the cart or increase its quantity.
-     */
     @PostMapping("/{customerId}/items")
-    public CartResponse addBookToCart(
-            @PathVariable Long customerId,
-            @RequestBody CartItemRequest request) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public CartResponse addItem(@PathVariable Long customerId, @RequestBody CartItemRequest request) {
         return shoppingCartService.addBookToCart(customerId, request);
     }
 
-    /**
-     * Update quantity of a book in the cart.
-     */
     @PutMapping("/{customerId}/items/{isbn}")
-    public CartResponse updateBookQuantity(
-            @PathVariable Long customerId,
-            @PathVariable String isbn,
-            @RequestParam int quantity) {
+    public CartResponse updateItem(@PathVariable Long customerId, @PathVariable String isbn, @RequestParam int quantity) {
         return shoppingCartService.updateBookQuantity(customerId, isbn, quantity);
     }
 
-    /**
-     * Remove a book from the cart.
-     */
     @DeleteMapping("/{customerId}/items/{isbn}")
-    public CartResponse removeBookFromCart(
-            @PathVariable Long customerId,
-            @PathVariable String isbn) {
+    public CartResponse removeItem(@PathVariable Long customerId, @PathVariable String isbn) {
         return shoppingCartService.removeBookFromCart(customerId, isbn);
     }
 
-    @DeleteMapping("/{customerId}/clear")
+    @DeleteMapping("/{customerId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void clearCart(@PathVariable Long customerId) {
         shoppingCartService.clearCart(customerId);

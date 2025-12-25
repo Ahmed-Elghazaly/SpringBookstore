@@ -3,7 +3,7 @@ package com.example.bookstore.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Author_Book")
+@Table(name = "author_book")
 public class AuthorBook {
 
     @EmbeddedId
@@ -11,10 +11,12 @@ public class AuthorBook {
 
     @ManyToOne(optional = false)
     @MapsId("authorId")
+    @JoinColumn(name = "author_id")
     private Author author;
 
     @ManyToOne(optional = false)
     @MapsId("bookIsbn")
+    @JoinColumn(name = "book_isbn")
     private Book book;
 
     protected AuthorBook() {
@@ -24,6 +26,10 @@ public class AuthorBook {
         this.author = author;
         this.book = book;
         this.id = new AuthorBookId(author.getAuthorId(), book.getIsbn());
+    }
+
+    public AuthorBookId getId() {
+        return id;
     }
 
     public Author getAuthor() {

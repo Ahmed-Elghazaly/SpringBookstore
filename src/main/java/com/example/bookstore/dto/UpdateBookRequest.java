@@ -7,5 +7,4 @@ public record UpdateBookRequest(
         BigDecimal sellingPrice,
         Integer stockQuantity,
         Integer thresholdQuantity
-) {
-}
+) {}

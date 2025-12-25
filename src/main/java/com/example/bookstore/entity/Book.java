@@ -1,12 +1,11 @@
 package com.example.bookstore.entity;
 
 import jakarta.persistence.*;
-
 import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
-@Table(name = "Book")
+@Table(name = "book")
 public class Book {
 
     @Id
@@ -38,16 +37,11 @@ public class Book {
     @OneToMany(mappedBy = "book")
     private List<AuthorBook> authorBooks;
 
-    @OneToMany(mappedBy = "book")
-    private List<CartBook> cartBooks;
-
-   
-
     protected Book() {
-        // Required by JPA: used internally via reflection
     }
 
-    public Book(String isbn, String title, Integer publicationYear, BigDecimal sellingPrice, int stockQuantity, int thresholdQuantity, Publisher publisher, Category category) {
+    public Book(String isbn, String title, Integer publicationYear, BigDecimal sellingPrice, 
+                int stockQuantity, int thresholdQuantity, Publisher publisher, Category category) {
         this.isbn = isbn;
         this.title = title;
         this.publicationYear = publicationYear;
@@ -58,65 +52,21 @@ public class Book {
         this.category = category;
     }
 
-    public String getIsbn() {
-        return isbn;
-    }
+    // Getters
+    public String getIsbn() { return isbn; }
+    public String getTitle() { return title; }
+    public Integer getPublicationYear() { return publicationYear; }
+    public BigDecimal getSellingPrice() { return sellingPrice; }
+    public int getStockQuantity() { return stockQuantity; }
+    public int getThresholdQuantity() { return thresholdQuantity; }
+    public Publisher getPublisher() { return publisher; }
+    public Category getCategory() { return category; }
+    public List<AuthorBook> getAuthorBooks() { return authorBooks; }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public BigDecimal getSellingPrice() {
-        return sellingPrice;
-    }
-
-    public int getStockQuantity() {
-        return stockQuantity;
-    }
-
-    public int getThresholdQuantity() {
-        return thresholdQuantity;
-    }
-
-    public Publisher getPublisher() {
-        return publisher;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public List<AuthorBook> getAuthorBooks() {
-        return authorBooks;
-    }
-
-    public List<CartBook> getCartBooks() {
-        return cartBooks;
-    }
-
-    
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setSellingPrice(BigDecimal sellingPrice) {
-        this.sellingPrice = sellingPrice;
-    }
-
-    public void setStockQuantity(int stockQuantity) {
-        this.stockQuantity = stockQuantity;
-    }
-
-    public void setThresholdQuantity(int thresholdQuantity) {
-        this.thresholdQuantity = thresholdQuantity;
-    }
-
-    public Integer getPublicationYear() {
-        return publicationYear;
-    }
-
-    public void setPublicationYear(Integer publicationYear) {
-        this.publicationYear = publicationYear;
-    }
+    // Setters
+    public void setTitle(String title) { this.title = title; }
+    public void setPublicationYear(Integer publicationYear) { this.publicationYear = publicationYear; }
+    public void setSellingPrice(BigDecimal sellingPrice) { this.sellingPrice = sellingPrice; }
+    public void setStockQuantity(int stockQuantity) { this.stockQuantity = stockQuantity; }
+    public void setThresholdQuantity(int thresholdQuantity) { this.thresholdQuantity = thresholdQuantity; }
 }

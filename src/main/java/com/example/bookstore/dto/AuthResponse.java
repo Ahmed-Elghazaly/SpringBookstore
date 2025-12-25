@@ -1,8 +1,8 @@
 package com.example.bookstore.dto;
 
 public record AuthResponse(
-        Long id,
+        Long userId,
         String username,
-        String role, // "ADMIN" or "CUSTOMER"
-        String name // First name or Admin name
+        String name,
+        String role
 ) {}

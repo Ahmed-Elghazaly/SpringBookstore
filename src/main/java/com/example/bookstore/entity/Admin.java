@@ -3,11 +3,12 @@ package com.example.bookstore.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Admin")
+@Table(name = "admin")
 public class Admin {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "admin_id")
     private Long adminId;
 
     @Column(nullable = false, unique = true)

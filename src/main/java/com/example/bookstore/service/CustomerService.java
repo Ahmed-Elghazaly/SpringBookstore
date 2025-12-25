@@ -5,9 +5,7 @@ import com.example.bookstore.dto.CustomerResponse;
 import com.example.bookstore.dto.UpdateCustomerRequest;
 
 public interface CustomerService {
-
-
     CustomerResponse register(CreateCustomerRequest request);
-    CustomerResponse updateCustomer(Long customerId, UpdateCustomerRequest request);
-    CustomerResponse getCustomer(Long customerId);
+    CustomerResponse getProfile(Long customerId);
+    CustomerResponse updateProfile(Long customerId, UpdateCustomerRequest request);
 }

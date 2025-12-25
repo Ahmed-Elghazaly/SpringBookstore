@@ -2,16 +2,14 @@ import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {authApi, customerApi} from '../api/client';
 import toast from 'react-hot-toast';
-import {ShieldCheck, User} from 'lucide-react'; // Make sure to install lucide-react if needed
+import {ShieldCheck, User} from 'lucide-react';
 
 export default function Login() {
-    const [role, setRole] = useState('CUSTOMER'); // 'CUSTOMER' or 'ADMIN'
+    const [role, setRole] = useState('CUSTOMER');
     const [isRegistering, setIsRegistering] = useState(false);
 
-    // Login State
     const [loginData, setLoginData] = useState({username: '', password: ''});
 
-    // Registration State
     const [regData, setRegData] = useState({
         username: '', password: '', email: '', firstName: '', lastName: '', phoneNumber: '', shippingAddress: ''
     });
@@ -23,20 +21,23 @@ export default function Login() {
         try {
             const res = await authApi.login({...loginData, role});
 
-            // Store Auth Data
-            localStorage.setItem('user', JSON.stringify(res.data));
+            // FIX: Backend returns 'userId', not 'id'
+            const userData = res.data;
 
-            if (res.data.role === 'CUSTOMER') {
-                localStorage.setItem('customerId', res.data.id);
+            localStorage.setItem('user', JSON.stringify(userData));
+
+            if (userData.role === 'CUSTOMER') {
+                // FIX: Grab 'userId' from response
+                localStorage.setItem('customerId', userData.userId);
             }
 
-            toast.success(`Welcome ${res.data.name}!`);
+            toast.success(`Welcome ${userData.name}!`);
 
-            // Redirect based on role
-            if (res.data.role === 'ADMIN') navigate('/admin');
+            if (userData.role === 'ADMIN') navigate('/admin');
             else navigate('/');
 
         } catch (err) {
+            console.error(err);
             toast.error("Invalid Username or Password");
         }
     };
@@ -48,21 +49,20 @@ export default function Login() {
             toast.success("Account created! Please login.");
             setIsRegistering(false);
         } catch (err) {
-            toast.error("Registration failed. Try a different username.");
+            console.error(err);
+            const msg = err.response?.data?.message || "Registration failed.";
+            toast.error(msg);
         }
     };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
             <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-100">
-
-                {/* Header */}
                 <div className="text-center mb-6">
                     <h1 className="text-3xl font-bold text-brand-600">GoldenBooks</h1>
                     <p className="text-gray-500 text-sm">Database Systems Project 2025</p>
                 </div>
 
-                {/* Role Toggle */}
                 {!isRegistering && (
                     <div className="flex bg-gray-100 p-1 rounded-lg mb-6">
                         <button
@@ -84,7 +84,6 @@ export default function Login() {
                     </div>
                 )}
 
-                {/* FORMS */}
                 {!isRegistering ? (
                     <form onSubmit={handleLogin} className="space-y-4">
                         <input
@@ -112,8 +111,7 @@ export default function Login() {
                         {role === 'CUSTOMER' && (
                             <p className="text-center text-sm text-gray-500 mt-4">
                                 No account? <button type="button" onClick={() => setIsRegistering(true)}
-                                                    className="text-brand-600 font-bold hover:underline">Sign
-                                up</button>
+                                                    className="text-brand-600 font-bold hover:underline">Sign up</button>
                             </p>
                         )}
                     </form>

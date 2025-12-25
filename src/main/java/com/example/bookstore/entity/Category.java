@@ -1,20 +1,19 @@
 package com.example.bookstore.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "Category")
+@Table(name = "category")
 public class Category {
 
     @Id
+    @Column(name = "category_name")
     private String categoryName;
 
     @OneToMany(mappedBy = "category")
+    @JsonIgnore
     private List<Book> books;
 
     protected Category() {

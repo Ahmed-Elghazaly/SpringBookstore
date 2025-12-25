@@ -1,11 +1,10 @@
 package com.example.bookstore.entity;
 
 import jakarta.persistence.*;
-
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "Order_Book")
+@Table(name = "order_book")
 public class OrderBook {
 
     @EmbeddedId
@@ -13,21 +12,18 @@ public class OrderBook {
 
     @ManyToOne(optional = false)
     @MapsId("orderId")
+    @JoinColumn(name = "order_id")
     private Order order;
 
     @ManyToOne(optional = false)
     @MapsId("bookIsbn")
+    @JoinColumn(name = "book_isbn")
     private Book book;
 
     @Column(nullable = false)
     private int quantity;
 
-    @Column(
-            name = "price_at_purchase",
-            nullable = false,
-            precision = 10,
-            scale = 2
-    )
+    @Column(name = "price_at_purchase", nullable = false, precision = 10, scale = 2)
     private BigDecimal priceAtPurchase;
 
     protected OrderBook() {
@@ -41,19 +37,9 @@ public class OrderBook {
         this.id = new OrderBookId(order.getOrderId(), book.getIsbn());
     }
 
-    public Order getOrder() {
-        return order;
-    }
-
-    public Book getBook() {
-        return book;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public BigDecimal getPriceAtPurchase() {
-        return priceAtPurchase;
-    }
+    public OrderBookId getId() { return id; }
+    public Order getOrder() { return order; }
+    public Book getBook() { return book; }
+    public int getQuantity() { return quantity; }
+    public BigDecimal getPriceAtPurchase() { return priceAtPurchase; }
 }

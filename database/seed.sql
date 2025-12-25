@@ -132,13 +132,3 @@ INSERT INTO customer (username, password, first_name, last_name, email, phone_nu
                                                                                                             ('janedoe', 'jane123', 'Jane', 'Doe', 'jane.doe@example.com', '555-987-6543', '456 Oak Avenue, Los Angeles, CA 90001'),
                                                                                                             ('bobsmith', 'bob123', 'Bob', 'Smith', 'bob.smith@example.com', NULL, '789 Pine Road, Chicago, IL 60601');
 
--- =====================================================
--- VERIFICATION: Check the data
--- =====================================================
--- Uncomment these to verify after running:
--- SELECT 'Publishers' as entity, COUNT(*) as count FROM publisher
--- UNION ALL SELECT 'Categories', COUNT(*) FROM category
--- UNION ALL SELECT 'Authors', COUNT(*) FROM author
--- UNION ALL SELECT 'Books', COUNT(*) FROM book
--- UNION ALL SELECT 'Author-Book Links', COUNT(*) FROM author_book
--- UNION ALL SELECT 'Customers', COUNT(*) FROM customer;
