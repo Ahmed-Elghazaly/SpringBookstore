@@ -27,13 +27,15 @@ public interface OrderBookRepository extends Repository<OrderBook, Long> {
     );
 
     @Query(value = """
-            SELECT b.isbn AS isbn, b.title AS title, SUM(ob.quantity) AS total_sold
+            SELECT b.isbn AS "isbn",
+                   b.title AS "title",
+                   SUM(ob.quantity) AS "totalSold"
             FROM order_book ob
             JOIN book b ON b.isbn = ob.book_isbn
             JOIN "order" o ON o.order_id = ob.order_id
             WHERE o.order_date >= CURRENT_DATE - INTERVAL '3 months'
             GROUP BY b.isbn, b.title
-            ORDER BY total_sold DESC
+            ORDER BY "totalSold" DESC
             LIMIT 10
             """, nativeQuery = true)
     List<Map<String, Object>> findTop10SellingBooks();

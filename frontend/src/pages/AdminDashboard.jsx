@@ -10,29 +10,47 @@ export default function AdminDashboard() {
     const [orderCount, setOrderCount] = useState(null);
 
     const loadReport = async () => {
-        let res;
-        if (activeTab === 'customers') res = await reportApi.getTopCustomers();
-        if (activeTab === 'books') res = await reportApi.getTopBooks();
-        setData(res ? res.data : []);
+        try {
+            let res;
+            if (activeTab === 'customers') res = await reportApi.getTopCustomers();
+            if (activeTab === 'books') res = await reportApi.getTopBooks();
+            setData(res ? res.data : []);
+        } catch (err) {
+            console.error("Failed to load report", err);
+        }
     };
 
     useEffect(() => { loadReport(); }, [activeTab]);
 
     const handleDateSales = async () => {
         if (!salesDate) return;
-        const res = await reportApi.getSalesByDate(salesDate);
-        setSalesAmount(res.data);
+        try {
+            const res = await reportApi.getSalesByDate(salesDate);
+            // FIX: Backend returns { totalSales: 100 }, extract the number
+            setSalesAmount(res.data.totalSales);
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     const handlePrevMonthSales = async () => {
-        const res = await reportApi.getSalesPrevMonth();
-        setSalesAmount(res.data);
+        try {
+            const res = await reportApi.getSalesPrevMonth();
+            // FIX: Backend returns { totalSales: 100 }, extract the number
+            setSalesAmount(res.data.totalSales);
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     const handleBookOrderCount = async () => {
         if (!bookIsbn) return;
-        const res = await reportApi.getBookOrderCount(bookIsbn);
-        setOrderCount(res.data);
+        try {
+            const res = await reportApi.getBookOrderCount(bookIsbn);
+            setOrderCount(res.data);
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     return (
@@ -41,30 +59,10 @@ export default function AdminDashboard() {
 
             {/* Tab Navigation */}
             <div className="flex bg-white rounded-lg p-1 border border-gray-200 mb-8">
-                <button
-                    onClick={() => setActiveTab('customers')}
-                    className={`px-4 py-2 rounded-md text-sm font-medium ${activeTab === 'customers' ? 'bg-brand-100 text-brand-700' : 'text-gray-500'}`}
-                >
-                    Top Customers
-                </button>
-                <button
-                    onClick={() => setActiveTab('books')}
-                    className={`px-4 py-2 rounded-md text-sm font-medium ${activeTab === 'books' ? 'bg-brand-100 text-brand-700' : 'text-gray-500'}`}
-                >
-                    Top Selling Books
-                </button>
-                <button
-                    onClick={() => setActiveTab('sales')}
-                    className={`px-4 py-2 rounded-md text-sm font-medium ${activeTab === 'sales' ? 'bg-brand-100 text-brand-700' : 'text-gray-500'}`}
-                >
-                    Sales Reports
-                </button>
-                <button
-                    onClick={() => setActiveTab('orders')}
-                    className={`px-4 py-2 rounded-md text-sm font-medium ${activeTab === 'orders' ? 'bg-brand-100 text-brand-700' : 'text-gray-500'}`}
-                >
-                    Publisher Orders
-                </button>
+                <button onClick={() => setActiveTab('customers')} className={`px-4 py-2 rounded-md text-sm font-medium ${activeTab === 'customers' ? 'bg-brand-100 text-brand-700' : 'text-gray-500'}`}>Top Customers</button>
+                <button onClick={() => setActiveTab('books')} className={`px-4 py-2 rounded-md text-sm font-medium ${activeTab === 'books' ? 'bg-brand-100 text-brand-700' : 'text-gray-500'}`}>Top Selling Books</button>
+                <button onClick={() => setActiveTab('sales')} className={`px-4 py-2 rounded-md text-sm font-medium ${activeTab === 'sales' ? 'bg-brand-100 text-brand-700' : 'text-gray-500'}`}>Sales Reports</button>
+                <button onClick={() => setActiveTab('orders')} className={`px-4 py-2 rounded-md text-sm font-medium ${activeTab === 'orders' ? 'bg-brand-100 text-brand-700' : 'text-gray-500'}`}>Publisher Orders</button>
             </div>
 
             {/* Top Customers Table */}
@@ -80,6 +78,7 @@ export default function AdminDashboard() {
                         <tbody>
                         {data.map((row, i) => (
                             <tr key={i} className="border-t">
+                                {/* Keys match the quoted aliases in OrderRepository */}
                                 <td className="p-4">{row.firstName} {row.lastName}</td>
                                 <td className="p-4 font-bold text-green-600">${row.totalSpent}</td>
                             </tr>
@@ -105,7 +104,8 @@ export default function AdminDashboard() {
                             <tr key={i} className="border-t">
                                 <td className="p-4 font-bold">{row.title}</td>
                                 <td className="p-4 text-gray-500 font-mono">{row.isbn}</td>
-                                <td className="p-4 font-bold text-brand-600">{row.total_sold}</td>
+                                {/* Matches quoted alias in OrderBookRepository */}
+                                <td className="p-4 font-bold text-brand-600">{row.totalSold}</td>
                             </tr>
                         ))}
                         </tbody>
@@ -119,32 +119,18 @@ export default function AdminDashboard() {
                     <div className="bg-white p-6 rounded-xl shadow-sm border">
                         <h3 className="font-bold mb-4">Sales by Specific Date</h3>
                         <div className="flex gap-4">
-                            <input
-                                type="date"
-                                value={salesDate}
-                                onChange={(e) => setSalesDate(e.target.value)}
-                                className="p-3 border rounded-lg flex-1"
-                            />
-                            <button onClick={handleDateSales} className="bg-brand-600 text-white px-6 py-3 rounded-lg font-bold">
-                                Get Sales
-                            </button>
+                            <input type="date" value={salesDate} onChange={(e) => setSalesDate(e.target.value)} className="p-3 border rounded-lg flex-1"/>
+                            <button onClick={handleDateSales} className="bg-brand-600 text-white px-6 py-3 rounded-lg font-bold">Get Sales</button>
                         </div>
                         {salesAmount !== null && (
-                            <div className="mt-4 text-2xl font-bold text-green-600">
-                                Total: ${salesAmount}
-                            </div>
+                            <div className="mt-4 text-2xl font-bold text-green-600">Total: ${salesAmount}</div>
                         )}
                     </div>
-
                     <div className="bg-white p-6 rounded-xl shadow-sm border">
                         <h3 className="font-bold mb-4">Sales Previous Month</h3>
-                        <button onClick={handlePrevMonthSales} className="bg-brand-600 text-white px-6 py-3 rounded-lg font-bold">
-                            Get Previous Month Sales
-                        </button>
+                        <button onClick={handlePrevMonthSales} className="bg-brand-600 text-white px-6 py-3 rounded-lg font-bold">Get Previous Month Sales</button>
                         {salesAmount !== null && (
-                            <div className="mt-4 text-2xl font-bold text-green-600">
-                                Total: ${salesAmount}
-                            </div>
+                            <div className="mt-4 text-2xl font-bold text-green-600">Total: ${salesAmount}</div>
                         )}
                     </div>
                 </div>
@@ -155,21 +141,11 @@ export default function AdminDashboard() {
                 <div className="bg-white p-6 rounded-xl shadow-sm border">
                     <h3 className="font-bold mb-4">Publisher Order Count for Book</h3>
                     <div className="flex gap-4">
-                        <input
-                            type="text"
-                            placeholder="Enter ISBN"
-                            value={bookIsbn}
-                            onChange={(e) => setBookIsbn(e.target.value)}
-                            className="p-3 border rounded-lg flex-1"
-                        />
-                        <button onClick={handleBookOrderCount} className="bg-brand-600 text-white px-6 py-3 rounded-lg font-bold">
-                            Get Count
-                        </button>
+                        <input type="text" placeholder="Enter ISBN" value={bookIsbn} onChange={(e) => setBookIsbn(e.target.value)} className="p-3 border rounded-lg flex-1"/>
+                        <button onClick={handleBookOrderCount} className="bg-brand-600 text-white px-6 py-3 rounded-lg font-bold">Get Count</button>
                     </div>
                     {orderCount !== null && (
-                        <div className="mt-4 text-2xl font-bold text-brand-600">
-                            Times Ordered: {orderCount}
-                        </div>
+                        <div className="mt-4 text-2xl font-bold text-brand-600">Times Ordered: {orderCount}</div>
                     )}
                 </div>
             )}

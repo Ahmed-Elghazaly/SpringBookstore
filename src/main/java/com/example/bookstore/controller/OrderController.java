@@ -53,4 +53,10 @@ public class OrderController {
         BigDecimal total = orderService.getTotalSalesPreviousMonth();
         return Map.of("totalSales", total != null ? total : BigDecimal.ZERO);
     }
+
+
+    @GetMapping("/reports/publisher-orders/{isbn}")
+    public Long getPublisherOrderCount(@PathVariable String isbn) {
+        return orderService.getPublisherOrderCountForBook(isbn);
+    }
 }
