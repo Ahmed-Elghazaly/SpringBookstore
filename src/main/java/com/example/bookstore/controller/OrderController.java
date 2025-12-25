@@ -58,10 +58,10 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getTotalSalesPreviousMonth());
     }
 
-    @GetMapping("/reports/publisher-orders/{isbn}")
+    /*@GetMapping("/reports/publisher-orders/{isbn}")
     public ResponseEntity<Long> getPublisherOrderCount(@PathVariable String isbn) {
         return ResponseEntity.ok(orderService.getPublisherOrderCountForBook(isbn));
-    }
+    }*/
 
     @PostMapping("/checkout/{customerId}")
     public ResponseEntity<Map<String, Object>> checkout(@PathVariable Long customerId, @RequestBody CheckoutRequest request) {
@@ -75,7 +75,7 @@ public class OrderController {
             return ResponseEntity.badRequest().body(Map.of("error", "Credit card has expired"));
         }
 
-        Long orderId = orderService.checkout(customerId);
+        Long orderId = orderService.checkout(customerId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("orderId", orderId, "message", "Order placed successfully"));
     }
 }

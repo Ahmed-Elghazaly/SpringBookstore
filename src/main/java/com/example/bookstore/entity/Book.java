@@ -41,8 +41,7 @@ public class Book {
     @OneToMany(mappedBy = "book")
     private List<CartBook> cartBooks;
 
-    @OneToMany(mappedBy = "book")
-    private List<PublisherOrderBook> publisherOrderBooks;
+   
 
     protected Book() {
         // Required by JPA: used internally via reflection
@@ -95,9 +94,7 @@ public class Book {
         return cartBooks;
     }
 
-    public List<PublisherOrderBook> getPublisherOrderBooks() {
-        return publisherOrderBooks;
-    }
+    
 
     public void setTitle(String title) {
         this.title = title;

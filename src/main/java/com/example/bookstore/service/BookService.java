@@ -19,7 +19,7 @@ public interface BookService {
     BookResponse patchUpdateBook(String isbn, UpdateBookRequest request);
 
     List<BookResponse> searchBooks(String isbn,      // ADD THIS
-                                   String title, String category, String author, String publisher);
+                                   String title, String category, String publisher, String author);
 
     void deleteBook(String isbn);
 }

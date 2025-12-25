@@ -110,7 +110,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookResponse> searchBooks(String isbn, String title, String category, String author, String publisher) {
+    public List<BookResponse> searchBooks(String isbn, String title, String category, String publisher, String author) {
         var books = bookRepository.findBooksDynamic(isbn, title, category, publisher, author);
         return books.stream().map(BookMapper::toResponse).toList();
     }

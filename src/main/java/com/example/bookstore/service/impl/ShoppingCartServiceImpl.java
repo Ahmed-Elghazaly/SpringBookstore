@@ -5,7 +5,6 @@ import com.example.bookstore.dto.CartResponse;
 import com.example.bookstore.entity.Book;
 import com.example.bookstore.repository.BookRepository;
 import com.example.bookstore.repository.CartBookRepository;
-import com.example.bookstore.repository.ShoppingCartRepository;
 import com.example.bookstore.service.ShoppingCartService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,117 +12,94 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * Implementation of ShoppingCartService.
+ * 
+ * Key Design Decision: We use customerId directly instead of cartId because
+ * the ShoppingCart table was eliminated (it was 1:1 with Customer, so we
+ * merged them by having cart_book reference customer_id directly).
+ */
 @Service
 @Transactional
 public class ShoppingCartServiceImpl implements ShoppingCartService {
 
-    private final ShoppingCartRepository shoppingCartRepository;
     private final CartBookRepository cartBookRepository;
-    private final BookRepository bookRepository;  // ADD THIS LINE
+    private final BookRepository bookRepository;
 
-    public ShoppingCartServiceImpl(ShoppingCartRepository shoppingCartRepository,
-                                   CartBookRepository cartBookRepository, BookRepository bookRepository) {  // ADD PARAMETER
-        this.shoppingCartRepository = shoppingCartRepository;
+    public ShoppingCartServiceImpl(CartBookRepository cartBookRepository, BookRepository bookRepository) {
         this.cartBookRepository = cartBookRepository;
-        this.bookRepository = bookRepository;  // ADD THIS LINE
+        this.bookRepository = bookRepository;
     }
 
     @Override
     public CartResponse getCart(Long customerId) {
-        Long cartId = getCartIdOrThrow(customerId);
-        var rows = cartBookRepository.findItemsByCartId(cartId);
+        // Fetch cart items using customer_id (not cart_id)
+        var rows = cartBookRepository.findItemsByCustomerId(customerId);
 
+        // Map projection results to CartItem DTOs
         List<CartResponse.CartItem> items = rows.stream().map(row -> {
             BigDecimal subtotal = row.getPrice().multiply(BigDecimal.valueOf(row.getQuantity()));
-            return new CartResponse.CartItem(row.getIsbn(), row.getTitle(), row.getPrice(), row.getQuantity(), subtotal);
+            return new CartResponse.CartItem(
+                    row.getIsbn(),
+                    row.getTitle(),
+                    row.getPrice(),
+                    row.getQuantity(),
+                    subtotal
+            );
         }).toList();
 
-        BigDecimal totalPrice = items.stream().map(CartResponse.CartItem::subtotal).reduce(BigDecimal.ZERO, BigDecimal::add);
+        // Calculate total price
+        BigDecimal total = items.stream()
+                .map(CartResponse.CartItem::subtotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return CartResponse.from(cartId, items, totalPrice);
+        return new CartResponse(items, total);
     }
 
     @Override
     public CartResponse addBookToCart(Long customerId, CartItemRequest request) {
+        // Validate book exists
+        Book book = bookRepository.findById(request.isbn())
+                .orElseThrow(() -> new RuntimeException("Book not found: " + request.isbn()));
 
-
-        // Validate book exists and has enough stock
-        Book book = bookRepository.findByIsbn(request.isbn()).orElseThrow(() -> new IllegalArgumentException("Book not found: " + request.isbn()));
-
-
-        Long cartId = shoppingCartRepository.findCartIdByCustomerId(customerId).orElseGet(() -> shoppingCartRepository.createCart(customerId));
-
-
-        // Note: The upsert ADDS quantity, so we need to check total won't exceed stock
-        // This is a simplification - for full accuracy you'd need to query current cart qty
+        // Check if there's enough stock
         if (book.getStockQuantity() < request.quantity()) {
-            throw new IllegalStateException("Not enough stock for " + book.getTitle());
+            throw new RuntimeException("Not enough stock. Available: " + book.getStockQuantity());
         }
 
+        // Add to cart using upsert (inserts if not exists, adds quantity if exists)
+        cartBookRepository.upsertCartItem(customerId, request.isbn(), request.quantity());
 
-        cartBookRepository.upsertBook(cartId, request.isbn(), request.quantity());
-
-        // Fetch full details including book information
-        var rows = cartBookRepository.findItemsByCartId(cartId);
-
-        List<CartResponse.CartItem> items = rows.stream().map(row -> {
-            BigDecimal subtotal = row.getPrice().multiply(BigDecimal.valueOf(row.getQuantity()));
-            return new CartResponse.CartItem(row.getIsbn(), row.getTitle(), row.getPrice(), row.getQuantity(), subtotal);
-        }).toList();
-
-        BigDecimal totalPrice = items.stream().map(CartResponse.CartItem::subtotal).reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        return CartResponse.from(cartId, items, totalPrice);
+        return getCart(customerId);
     }
 
     @Override
     public CartResponse updateBookQuantity(Long customerId, String isbn, int quantity) {
-        Long cartId = getCartIdOrThrow(customerId);
+        if (quantity <= 0) {
+            // If quantity is 0 or negative, remove the item
+            return removeBookFromCart(customerId, isbn);
+        }
 
-        cartBookRepository.updateQuantity(cartId, isbn, quantity);
+        // Check stock availability
+        Book book = bookRepository.findById(isbn)
+                .orElseThrow(() -> new RuntimeException("Book not found: " + isbn));
+        
+        if (book.getStockQuantity() < quantity) {
+            throw new RuntimeException("Not enough stock. Available: " + book.getStockQuantity());
+        }
 
-        // Fetch full details including book information
-        var rows = cartBookRepository.findItemsByCartId(cartId);
-
-        List<CartResponse.CartItem> items = rows.stream().map(row -> {
-            BigDecimal subtotal = row.getPrice().multiply(BigDecimal.valueOf(row.getQuantity()));
-            return new CartResponse.CartItem(row.getIsbn(), row.getTitle(), row.getPrice(), row.getQuantity(), subtotal);
-        }).toList();
-
-        BigDecimal totalPrice = items.stream().map(CartResponse.CartItem::subtotal).reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        return CartResponse.from(cartId, items, totalPrice);
+        cartBookRepository.updateQuantity(customerId, isbn, quantity);
+        return getCart(customerId);
     }
 
     @Override
     public CartResponse removeBookFromCart(Long customerId, String isbn) {
-        Long cartId = getCartIdOrThrow(customerId);
-
-        cartBookRepository.removeBook(cartId, isbn);
-
-        // Fetch full details including book information
-        var rows = cartBookRepository.findItemsByCartId(cartId);
-
-        List<CartResponse.CartItem> items = rows.stream().map(row -> {
-            BigDecimal subtotal = row.getPrice().multiply(BigDecimal.valueOf(row.getQuantity()));
-            return new CartResponse.CartItem(row.getIsbn(), row.getTitle(), row.getPrice(), row.getQuantity(), subtotal);
-        }).toList();
-
-        BigDecimal totalPrice = items.stream().map(CartResponse.CartItem::subtotal).reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        return CartResponse.from(cartId, items, totalPrice);
-    }
-
-    private Long getCartIdOrThrow(Long customerId) {
-        return shoppingCartRepository.findCartIdByCustomerId(customerId).orElseThrow(() -> new RuntimeException("Shopping cart does not exist for customer " + customerId));
+        cartBookRepository.removeItem(customerId, isbn);
+        return getCart(customerId);
     }
 
     @Override
     public void clearCart(Long customerId) {
-        Long cartId = shoppingCartRepository.findCartIdByCustomerId(customerId).orElse(null);
-
-        if (cartId != null) {
-            cartBookRepository.clearCart(cartId);
-        }
+        cartBookRepository.clearCart(customerId);
     }
 }

@@ -49,8 +49,8 @@ public class BookController {
 
     @GetMapping("/search")
     public List<BookResponse> searchBooks(@RequestParam(required = false) String isbn,      // ADD THIS
-                                          @RequestParam(required = false) String title, @RequestParam(required = false) String category, @RequestParam(required = false) String author, @RequestParam(required = false) String publisher) {
-        return bookService.searchBooks(isbn, title, category, author, publisher);  // ADD isbn
+                                          @RequestParam(required = false) String title, @RequestParam(required = false) String category, @RequestParam(required = false) String publisher, @RequestParam(required = false) String author) {
+        return bookService.searchBooks(isbn, title, category, publisher, author);  // ADD isbn
     }
 
     @DeleteMapping("/{isbn}")

@@ -3,61 +3,56 @@ package com.example.bookstore.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
-@Table(name = "PublisherOrder")
+@Table(name = "publisher_order")
 public class PublisherOrder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "publisher_order_id")
     private Long publisherOrderId;
 
-    @Column(nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_isbn", nullable = false)
+    private Book book;
+
+    @Column(name = "order_date", nullable = false)
     private LocalDate orderDate;
 
     @Column(nullable = false)
-    private int orderQuantity;
+    private Integer quantity;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private String status;
 
-    @OneToMany(mappedBy = "publisherOrder")
-    private List<PublisherOrderBook> publisherOrderBooks;
+    // Constructors
+    public PublisherOrder() {}
 
-    protected PublisherOrder() {
+    public PublisherOrder(Book book, Integer quantity) {
+        this.book = book;
+        this.quantity = quantity;
+        this.orderDate = LocalDate.now();
+        this.status = "Pending";
     }
 
-    public PublisherOrder(LocalDate orderDate, int orderQuantity, String status) {
-        this.orderDate = orderDate;
-        this.orderQuantity = orderQuantity;
-        this.status = status;
-    }
-
-    public Long getPublisherOrderId() {
-        return publisherOrderId;
-    }
-
-    public LocalDate getOrderDate() {
-        return orderDate;
-    }
-
-    public int getOrderQuantity() {
-        return orderQuantity;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
+    // Business method
     public void confirm() {
-        if (!"Pending".equalsIgnoreCase(this.status)) {
-            throw new IllegalStateException("Publisher order cannot be confirmed unless it is in Pending state");
+        if (!"Pending".equals(this.status)) {
+            throw new IllegalStateException("Only pending orders can be confirmed");
         }
         this.status = "Confirmed";
     }
 
-    public List<PublisherOrderBook> getPublisherOrderBooks() {
-        return publisherOrderBooks;
-    }
+    // Getters and Setters
+    public Long getPublisherOrderId() { return publisherOrderId; }
+    public void setPublisherOrderId(Long publisherOrderId) { this.publisherOrderId = publisherOrderId; }
+    public Book getBook() { return book; }
+    public void setBook(Book book) { this.book = book; }
+    public LocalDate getOrderDate() { return orderDate; }
+    public void setOrderDate(LocalDate orderDate) { this.orderDate = orderDate; }
+    public Integer getQuantity() { return quantity; }
+    public void setQuantity(Integer quantity) { this.quantity = quantity; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

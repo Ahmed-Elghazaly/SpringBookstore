@@ -10,17 +10,26 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository for Book entity operations.
+ * Provides search, stock management, and CRUD operations for books.
+ */
 public interface BookRepository extends JpaRepository<Book, String> {
 
-    /* =========================
-       Basic lookup
-       ========================= */
+    // ==================== BASIC LOOKUP ====================
+
+    /**
+     * Find a book by its ISBN (primary key).
+     */
     Optional<Book> findByIsbn(String isbn);
 
-    /* =========================
-       GOLDEN SEARCH: TITLE + CATEGORY + AUTHOR + PUBLISHER
-       Single dynamic PostgreSQL-native query
-       ========================= */
+    // ==================== SEARCH ====================
+
+    /**
+     * Dynamic search across multiple fields.
+     * All parameters are optional - pass null to ignore a filter.
+     * Uses PostgreSQL ILIKE for case-insensitive matching.
+     */
     @Query(value = """
             SELECT DISTINCT b.*
             FROM book b
@@ -35,27 +44,43 @@ public interface BookRepository extends JpaRepository<Book, String> {
             """, nativeQuery = true)
     List<Book> findBooksDynamic(@Param("isbn") String isbn, @Param("title") String title, @Param("category") String category, @Param("publisher") String publisher, @Param("author") String author);
 
-    /* =========================
-       REDUCE STOCK FROM CART
-       ========================= */
+    // ==================== STOCK MANAGEMENT ====================
+
+    /**
+     * Reduce the stock quantity of a book by a specific amount.
+     * Used during checkout to decrease inventory.
+     * <p>
+     * Note: The database trigger 'trg_prevent_negative_stock' will prevent
+     * stock from going below zero.
+     *
+     * @param isbn   The book's ISBN
+     * @param amount The quantity to reduce (should be positive)
+     */
     @Modifying
     @Transactional
     @Query(value = """
-            UPDATE Book b
-            SET stock_quantity = b.stock_quantity - cb.quantity
-            FROM Cart_Book cb
-            WHERE cb.cart_id = :cartId
-              AND b.isbn = cb.book_isbn
+            UPDATE book
+            SET stock_quantity = stock_quantity - :amount
+            WHERE isbn = :isbn
             """, nativeQuery = true)
-    void reduceStockFromCart(@Param("cartId") Long cartId);
+    void reduceStock(@Param("isbn") String isbn, @Param("amount") int amount);
 
-
+    /**
+     * Increase the stock quantity of a book by a specific amount.
+     * Used when confirming publisher orders to add inventory.
+     * <p>
+     * Note: The database trigger 'trg_auto_publisher_order' will automatically
+     * create a publisher order if stock drops below the threshold.
+     *
+     * @param isbn   The book's ISBN
+     * @param amount The quantity to add (should be positive)
+     */
     @Modifying
+    @Transactional
     @Query(value = """
-                UPDATE book
-                SET stock_quantity = stock_quantity + :amount
-                WHERE isbn = :isbn
+            UPDATE book
+            SET stock_quantity = stock_quantity + :amount
+            WHERE isbn = :isbn
             """, nativeQuery = true)
     void increaseStock(@Param("isbn") String isbn, @Param("amount") int amount);
-
 }

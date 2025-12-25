@@ -8,18 +8,19 @@ import OrderHistory from './pages/OrderHistory';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminBooks from './pages/AdminBooks';
 import AdminPublisherOrders from './pages/AdminPublisherOrders';
+import AdminSettings from './pages/AdminSettings';
 import Profile from "./pages/Profile.jsx";
 
-// CustomerRoute is a wrapper component that protects customer-only pages.
-// If the user is not logged in or is not a customer, they are redirected to login.
+// CustomerRoute protects customer-only pages
+// Redirects to login if not logged in or not a customer
 function CustomerRoute({children}) {
     const user = JSON.parse(localStorage.getItem('user'));
     if (!user || user.role !== 'CUSTOMER') return <Navigate to="/login"/>;
     return children;
 }
 
-// AdminRoute is a wrapper component that protects admin-only pages.
-// If the user is not logged in or is not an admin, they are redirected to login.
+// AdminRoute protects admin-only pages
+// Redirects to login if not logged in or not an admin
 function AdminRoute({children}) {
     const user = JSON.parse(localStorage.getItem('user'));
     if (!user || user.role !== 'ADMIN') return <Navigate to="/login"/>;
@@ -28,15 +29,15 @@ function AdminRoute({children}) {
 
 function App() {
     return (<BrowserRouter>
-        {/* Toaster provides toast notifications positioned at bottom-right */}
+        {/* Toast notifications appear at bottom-right */}
         <Toaster position="bottom-right"/>
         <Routes>
-            {/* Public route - anyone can access the login page */}
+            {/* Public route - Login page */}
             <Route path="/login" element={<Login/>}/>
 
             {/* ==================== CUSTOMER ROUTES ==================== */}
             
-            {/* Home page - browse and search books */}
+            {/* Home - Browse and search books */}
             <Route path="/" element={<CustomerRoute>
                 <div className="min-h-screen bg-gray-50">
                     <Navbar/>
@@ -44,7 +45,7 @@ function App() {
                 </div>
             </CustomerRoute>}/>
 
-            {/* Shopping cart page */}
+            {/* Shopping Cart */}
             <Route path="/cart" element={<CustomerRoute>
                 <div className="min-h-screen bg-gray-50">
                     <Navbar/>
@@ -52,7 +53,7 @@ function App() {
                 </div>
             </CustomerRoute>}/>
 
-            {/* Order history page - view past purchases */}
+            {/* Order History */}
             <Route path="/orders" element={<CustomerRoute>
                 <div className="min-h-screen bg-gray-50">
                     <Navbar/>
@@ -60,7 +61,7 @@ function App() {
                 </div>
             </CustomerRoute>}/>
 
-            {/* Profile page - edit personal information */}
+            {/* Customer Profile */}
             <Route path="/profile" element={<CustomerRoute>
                 <div className="min-h-screen bg-gray-50">
                     <Navbar/>
@@ -70,7 +71,7 @@ function App() {
 
             {/* ==================== ADMIN ROUTES ==================== */}
             
-            {/* Admin dashboard - view reports (top customers, top books, sales) */}
+            {/* Admin Dashboard - Reports */}
             <Route path="/admin" element={<AdminRoute>
                 <div className="min-h-screen bg-gray-50">
                     <Navbar/>
@@ -78,7 +79,7 @@ function App() {
                 </div>
             </AdminRoute>}/>
 
-            {/* Admin book management - add and edit books */}
+            {/* Admin Book Management */}
             <Route path="/admin/books" element={<AdminRoute>
                 <div className="min-h-screen bg-gray-50">
                     <Navbar/>
@@ -86,11 +87,19 @@ function App() {
                 </div>
             </AdminRoute>}/>
 
-            {/* Admin publisher orders - view and confirm pending orders to add stock */}
+            {/* Admin Publisher Orders */}
             <Route path="/admin/publisher-orders" element={<AdminRoute>
                 <div className="min-h-screen bg-gray-50">
                     <Navbar/>
                     <AdminPublisherOrders/>
+                </div>
+            </AdminRoute>}/>
+
+            {/* Admin Settings - Manage Publishers & Categories */}
+            <Route path="/admin/settings" element={<AdminRoute>
+                <div className="min-h-screen bg-gray-50">
+                    <Navbar/>
+                    <AdminSettings/>
                 </div>
             </AdminRoute>}/>
         </Routes>

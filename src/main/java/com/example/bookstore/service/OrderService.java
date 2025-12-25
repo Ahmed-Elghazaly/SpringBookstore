@@ -1,13 +1,15 @@
 package com.example.bookstore.service;
 
-import java.util.List;
-import java.util.Map;
+import com.example.bookstore.dto.CheckoutRequest;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 public interface OrderService {
 
-    Long checkout(Long customerId);
+    public Long checkout(Long customerId, CheckoutRequest request);
 
     // =========================
     // REPORTS
@@ -22,5 +24,4 @@ public interface OrderService {
 
     List<Map<String, Object>> getCustomerOrderHistory(Long customerId);
 
-    Long getPublisherOrderCountForBook(String isbn);
 }

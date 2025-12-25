@@ -11,36 +11,27 @@ import java.util.Map;
 @Repository
 public interface PublisherOrderRepository extends JpaRepository<PublisherOrder, Long> {
 
-    /**
-     * Retrieves all pending publisher orders with their associated book details.
-     * 
-     * This query joins across four tables to provide a complete picture:
-     * - PublisherOrder: The main order record with status and date
-     * - Publisher_Order_Book: The junction table linking orders to books with quantities
-     * - Book: The book details including title and ISBN
-     * - Publisher: The publisher name for display purposes
-     * 
-     * Only orders with status 'Pending' are returned, as confirmed orders
-     * have already been processed and don't need admin action.
-     * 
-     * @return List of Maps where each map contains order and book information
-     */
+    // Find all pending orders with book and publisher details
     @Query(value = """
             SELECT 
                 po.publisher_order_id AS "orderId",
                 po.order_date AS "orderDate",
-                po.order_quantity AS "orderQuantity",
+                po.quantity AS "quantity",
                 po.status AS "status",
-                pob.book_isbn AS "isbn",
+                b.isbn AS "isbn",
                 b.title AS "bookTitle",
-                pob.quantity AS "quantity",
                 p.name AS "publisherName"
-            FROM PublisherOrder po
-            JOIN Publisher_Order_Book pob ON po.publisher_order_id = pob.publisher_order_id
-            JOIN Book b ON pob.book_isbn = b.isbn
-            JOIN Publisher p ON b.publisher_id = p.publisher_id
+            FROM publisher_order po
+            JOIN book b ON po.book_isbn = b.isbn
+            JOIN publisher p ON b.publisher_id = p.publisher_id
             WHERE po.status = 'Pending'
             ORDER BY po.order_date DESC
             """, nativeQuery = true)
     List<Map<String, Object>> findPendingOrdersWithDetails();
+
+    // Count orders for a specific book
+    @Query(value = """
+            SELECT COUNT(*) FROM publisher_order WHERE book_isbn = :isbn
+            """, nativeQuery = true)
+    Long countOrdersForBook(String isbn);
 }

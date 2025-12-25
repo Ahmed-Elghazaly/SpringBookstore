@@ -1,6 +1,6 @@
 import {Link, useNavigate} from 'react-router-dom';
 import api from '../api/client';
-import {BookOpen, LayoutDashboard, LogOut, ShoppingCart, User, Package, BookMarked} from 'lucide-react';
+import {BookMarked, BookOpen, LayoutDashboard, LogOut, Package, Settings, ShoppingCart, User} from 'lucide-react';
 
 export default function Navbar() {
     const navigate = useNavigate();
@@ -50,7 +50,7 @@ export default function Navbar() {
                     </div>
 
                     {/* Navigation Links */}
-                    <div className="flex items-center space-x-6">
+                    <div className="flex items-center space-x-4">
 
                         {/* ==================== CUSTOMER LINKS ==================== */}
                         {user.role === 'CUSTOMER' && (
@@ -58,7 +58,7 @@ export default function Navbar() {
                                 {/* Browse books link */}
                                 <Link 
                                     to="/" 
-                                    className="text-gray-600 hover:text-brand-600 font-medium flex items-center gap-1"
+                                    className="text-gray-600 hover:text-brand-600 font-medium flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-gray-100"
                                 >
                                     <BookOpen size={18}/> Browse
                                 </Link>
@@ -66,15 +66,15 @@ export default function Navbar() {
                                 {/* Order history link */}
                                 <Link 
                                     to="/orders" 
-                                    className="text-gray-600 hover:text-brand-600 font-medium"
+                                    className="text-gray-600 hover:text-brand-600 font-medium px-3 py-2 rounded-lg hover:bg-gray-100"
                                 >
                                     My Orders
                                 </Link>
                                 
-                                {/* Profile link - allows customers to edit their information */}
+                                {/* Profile link */}
                                 <Link 
                                     to="/profile" 
-                                    className="text-gray-600 hover:text-brand-600 font-medium flex items-center gap-1"
+                                    className="text-gray-600 hover:text-brand-600 font-medium flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-gray-100"
                                 >
                                     <User size={18}/> Profile
                                 </Link>
@@ -82,7 +82,7 @@ export default function Navbar() {
                                 {/* Shopping cart link */}
                                 <Link 
                                     to="/cart" 
-                                    className="relative text-gray-600 hover:text-brand-600"
+                                    className="relative text-gray-600 hover:text-brand-600 p-2 rounded-lg hover:bg-gray-100"
                                 >
                                     <ShoppingCart size={24}/>
                                 </Link>
@@ -95,25 +95,33 @@ export default function Navbar() {
                                 {/* Reports dashboard link */}
                                 <Link 
                                     to="/admin" 
-                                    className="text-gray-600 hover:text-brand-600 font-medium flex items-center gap-1"
+                                    className="text-gray-600 hover:text-brand-600 font-medium flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-gray-100"
                                 >
                                     <LayoutDashboard size={18}/> Reports
                                 </Link>
                                 
-                                {/* Book management link - add/edit books */}
+                                {/* Book management link */}
                                 <Link 
                                     to="/admin/books" 
-                                    className="text-gray-600 hover:text-brand-600 font-medium flex items-center gap-1"
+                                    className="text-gray-600 hover:text-brand-600 font-medium flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-gray-100"
                                 >
-                                    <BookMarked size={18}/> Manage Books
+                                    <BookMarked size={18}/> Books
                                 </Link>
                                 
-                                {/* Publisher orders link - confirm pending orders to add stock */}
+                                {/* Publisher orders link */}
                                 <Link 
                                     to="/admin/publisher-orders" 
-                                    className="text-gray-600 hover:text-brand-600 font-medium flex items-center gap-1"
+                                    className="text-gray-600 hover:text-brand-600 font-medium flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-gray-100"
                                 >
-                                    <Package size={18}/> Publisher Orders
+                                    <Package size={18}/> Orders
+                                </Link>
+                                
+                                {/* Settings link - Manage Publishers & Categories */}
+                                <Link 
+                                    to="/admin/settings" 
+                                    className="text-gray-600 hover:text-brand-600 font-medium flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-gray-100"
+                                >
+                                    <Settings size={18}/> Settings
                                 </Link>
                             </>
                         )}

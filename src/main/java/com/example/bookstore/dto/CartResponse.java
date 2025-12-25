@@ -3,15 +3,15 @@ package com.example.bookstore.dto;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * Response DTO for shopping cart data.
+ * Note: We removed cartId since cart is now directly linked to customerId
+ * (the ShoppingCart table was eliminated in the simplified schema).
+ */
 public record CartResponse(
-        Long cartId,
         List<CartItem> items,
         BigDecimal totalPrice
 ) {
-
-    public static CartResponse from(Long cartId, List<CartItem> items, BigDecimal totalPrice) {
-        return new CartResponse(cartId, items, totalPrice);
-    }
 
     public record CartItem(
             String isbn,

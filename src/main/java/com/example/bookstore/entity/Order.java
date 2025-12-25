@@ -21,7 +21,10 @@ public class Order {
 
     protected Order() {
     }
-
+    public Order(Customer customer, LocalDate orderDate) {
+        this.customer = customer;
+        this.orderDate = orderDate;
+    }
     public Order(LocalDate orderDate) {
         this.orderDate = orderDate;
     }

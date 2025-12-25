@@ -23,7 +23,7 @@ public interface OrderRepository extends CrudRepository<com.example.bookstore.en
                 c.last_name   AS "lastName",
                 SUM(ob.quantity * ob.price_at_purchase) AS "totalSpent"
             FROM customer c
-            JOIN "Order" o ON c.customer_id = o.customer_id
+            JOIN "order" o ON c.customer_id = o.customer_id
             JOIN order_book ob ON o.order_id = ob.order_id
             WHERE o.order_date >= CURRENT_DATE - INTERVAL '3 months'
             GROUP BY c.customer_id, c.first_name, c.last_name
@@ -37,7 +37,7 @@ public interface OrderRepository extends CrudRepository<com.example.bookstore.en
        ========================= */
     @Query(value = """
             SELECT COALESCE(SUM(ob.quantity * ob.price_at_purchase), 0)
-            FROM "Order" o
+            FROM "order" o
             JOIN order_book ob ON o.order_id = ob.order_id
             WHERE o.order_date = :date
             """, nativeQuery = true)
@@ -48,7 +48,7 @@ public interface OrderRepository extends CrudRepository<com.example.bookstore.en
        ========================= */
     @Query(value = """
             SELECT COALESCE(SUM(ob.quantity * ob.price_at_purchase), 0)
-            FROM "Order" o
+            FROM "order" o
             JOIN order_book ob ON o.order_id = ob.order_id
             WHERE o.order_date >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')
               AND o.order_date < DATE_TRUNC('month', CURRENT_DATE)
@@ -66,7 +66,7 @@ public interface OrderRepository extends CrudRepository<com.example.bookstore.en
                 b.title           AS "title",
                 ob.quantity       AS "quantity",
                 ob.price_at_purchase AS "priceAtPurchase"
-            FROM "Order" o
+            FROM "order" o
             JOIN order_book ob ON o.order_id = ob.order_id
             JOIN book b ON ob.book_isbn = b.isbn
             WHERE o.customer_id = :customerId
@@ -74,10 +74,5 @@ public interface OrderRepository extends CrudRepository<com.example.bookstore.en
             """, nativeQuery = true)
     List<Map<String, Object>> findOrderHistoryByCustomerId(@Param("customerId") Long customerId);
 
-    @Query(value = """
-            SELECT COUNT(*)
-            FROM Publisher_Order_Book
-            WHERE book_isbn = :isbn
-            """, nativeQuery = true)
-    Long countPublisherOrdersForBook(@Param("isbn") String isbn);
+
 }
