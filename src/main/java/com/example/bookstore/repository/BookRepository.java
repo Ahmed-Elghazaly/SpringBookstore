@@ -19,10 +19,10 @@ public interface BookRepository extends JpaRepository<Book, String> {
             LEFT JOIN publisher p ON b.publisher_id = p.publisher_id
             LEFT JOIN author_book ab ON b.isbn = ab.book_isbn
             LEFT JOIN author a ON ab.author_id = a.author_id
-            WHERE 
+            WHERE
               (:isbn IS NULL OR b.isbn ILIKE CONCAT('%', :isbn, '%'))
               AND (:title IS NULL OR b.title ILIKE CONCAT('%', :title, '%'))
-              AND (:category IS NULL OR b.category_name ILIKE :category) 
+              AND (:category IS NULL OR b.category_name ILIKE :category)
               AND (:publisher IS NULL OR p.name ILIKE CONCAT('%', :publisher, '%'))
               AND (:author IS NULL OR a.name ILIKE CONCAT('%', :author, '%'))
             """, nativeQuery = true)

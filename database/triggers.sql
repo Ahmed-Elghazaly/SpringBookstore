@@ -1,18 +1,5 @@
--- =====================================================
--- GOLDEN BOOKS - DATABASE TRIGGERS
--- =====================================================
--- These triggers implement business logic that requires
--- cross-table operations or complex conditions that
--- cannot be expressed with simple CHECK constraints
--- =====================================================
-
--- =====================================================
--- TRIGGER 1: prevent_negative_stock
--- =====================================================
--- Purpose: Ensure stock never goes negative
--- Note: We have CHECK (stock_quantity >= 0) in schema,
---       but this trigger provides a better error message
--- =====================================================
+-- Ensure stock never goes negative
+-- We also have CHECK (stock_quantity >= 0) in schema,
 
 CREATE OR REPLACE FUNCTION prevent_negative_stock()
     RETURNS TRIGGER AS
@@ -28,6 +15,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
 CREATE TRIGGER trg_prevent_negative_stock
     BEFORE UPDATE OF stock_quantity
     ON book
@@ -35,21 +23,13 @@ CREATE TRIGGER trg_prevent_negative_stock
 EXECUTE FUNCTION prevent_negative_stock();
 
 
--- =====================================================
--- TRIGGER 2: auto_place_publisher_order
--- =====================================================
--- Purpose: Automatically create a publisher order when
---          stock DROPS BELOW the threshold quantity
--- Key Logic: Only triggers when CROSSING the threshold
---            (was above/at threshold, now below)
---            This prevents infinite loops and duplicate orders
--- =====================================================
 
+-- Automatically create a publisher order when stock drops below the threshold quantity
 CREATE OR REPLACE FUNCTION auto_place_publisher_order()
     RETURNS TRIGGER AS
 $$
 BEGIN
-    -- Only trigger when stock CROSSES below threshold
+    -- Only trigger when stock drops below threshold
     -- OLD.stock >= threshold AND NEW.stock < threshold
     IF OLD.stock_quantity >= OLD.threshold_quantity
         AND NEW.stock_quantity < NEW.threshold_quantity THEN
@@ -76,12 +56,7 @@ CREATE TRIGGER trg_auto_publisher_order
 EXECUTE FUNCTION auto_place_publisher_order();
 
 
--- =====================================================
--- TRIGGER 3: update_stock_on_order_confirm
--- =====================================================
--- Purpose: When a publisher order is confirmed,
---          automatically increase the book's stock
--- =====================================================
+-- When a publisher order is confirmed, automatically increase the book's stock
 
 CREATE OR REPLACE FUNCTION update_stock_on_order_confirm()
     RETURNS TRIGGER AS
@@ -106,22 +81,3 @@ CREATE TRIGGER trg_update_stock_on_confirm
     ON publisher_order
     FOR EACH ROW
 EXECUTE FUNCTION update_stock_on_order_confirm();
-
-
--- =====================================================
--- SUMMARY OF TRIGGERS
--- =====================================================
---
--- 1. trg_prevent_negative_stock (BEFORE UPDATE on book)
---    - Prevents stock from going negative
---    - Provides helpful error message
---
--- 2. trg_auto_publisher_order (AFTER UPDATE on book)
---    - Creates publisher order when stock drops below threshold
---    - Only fires once when crossing the threshold
---
--- 3. trg_update_stock_on_confirm (AFTER UPDATE on publisher_order)
---    - Increases stock when order status changes to Confirmed
---    - Simplifies the confirmation process
---
--- =====================================================

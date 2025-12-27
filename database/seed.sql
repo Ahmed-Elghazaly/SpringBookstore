@@ -1,18 +1,11 @@
--- =====================================================
--- GOLDEN BOOKS - SEED DATA
--- =====================================================
--- Run this AFTER schema_revised.sql and triggers_revised.sql
--- =====================================================
+-- Run this AFTER schema.sql and triggers.sql
 
--- =====================================================
--- SEED: Default Admin Account
--- =====================================================
+-- Default Admin Account
 INSERT INTO admin (username, password, name)
 VALUES ('admin', 'admin123', 'System Administrator');
 
--- =====================================================
--- SEED: Publishers
--- =====================================================
+
+-- Publishers
 INSERT INTO publisher (name, address, phone_number)
 VALUES ('Penguin Random House', '1745 Broadway, New York, NY 10019', '212-782-9000'),
        ('HarperCollins', '195 Broadway, New York, NY 10007', '212-207-7000'),
@@ -23,9 +16,7 @@ VALUES ('Penguin Random House', '1745 Broadway, New York, NY 10019', '212-782-90
        ('National Geographic', '1145 17th Street NW, Washington DC', '202-857-7000'),
        ('Taschen', 'Hohenzollernring 53, Cologne, Germany', '+49-221-201800');
 
--- =====================================================
--- SEED: Authors
--- =====================================================
+-- Authors
 INSERT INTO author (name)
 VALUES ('Stephen Hawking'),
        ('Carl Sagan'),
@@ -42,10 +33,6 @@ VALUES ('Stephen Hawking'),
        ('Jared Diamond'),
        ('Bill Bryson'),
        ('Simon Winchester');
-
--- =====================================================
--- SEED: Books (using the 5 hardcoded categories)
--- =====================================================
 
 -- Science Books
 INSERT INTO book (isbn, title, publication_year, selling_price, stock_quantity, threshold_quantity, publisher_id,
@@ -92,55 +79,129 @@ VALUES ('978-0393352009', 'The Map That Changed the World', 2001, 16.99, 40, 8, 
        ('978-0143126805', 'Prisoners of Geography', 2015, 17.99, 55, 10, 1, 'Geography'),
        ('978-0062466686', 'The Geography of Genius', 2016, 16.99, 35, 7, 3, 'Geography');
 
--- =====================================================
--- SEED: Author-Book Relationships
--- =====================================================
+
+-- Author-Book Relationships
 
 -- Science books
 INSERT INTO author_book (author_id, book_isbn)
-VALUES (1, '978-0553380163'), -- Hawking - Brief History
-       (2, '978-0345539434'), -- Sagan - Cosmos
-       (3, '978-0393609394'), -- Tyson - Astrophysics
+VALUES (1, '978-0553380163'),
+       (2, '978-0345539434'),
+       (3, '978-0393609394'),
        (4, '978-0618056736');
--- Dawkins - Selfish Gene
 
--- Art books (using author_id for da Vinci, van Gogh, Picasso)
 INSERT INTO author_book (author_id, book_isbn)
-VALUES (5, '978-3836562867'), -- da Vinci - Complete Works
+VALUES (5, '978-3836562867'),
        (6, '978-3836559591');
--- van Gogh - Complete Works
 
 -- Religion books
 INSERT INTO author_book (author_id, book_isbn)
-VALUES (8, '978-0345391469'), -- Armstrong - History of God
-       (9, '978-0812981605'), -- Aslan - Zealot
-       (8, '978-0061122002'), -- Armstrong - Great Transformation
+VALUES (8, '978-0345391469'),
+       (9, '978-0812981605'),
+       (8, '978-0061122002'),
        (8, '978-0060654672');
 -- Armstrong - Buddha
 
 -- History books
 INSERT INTO author_book (author_id, book_isbn)
-VALUES (10, '978-0062316097'), -- Harari - Sapiens
-       (11, '978-0743226721'), -- McCullough - 1776
-       (12, '978-1476748658'), -- Goodwin - Team of Rivals
-       (13, '978-0393354324'), -- Diamond - Guns Germs Steel
+VALUES (10, '978-0062316097'),
+       (11, '978-0743226721'),
+       (12, '978-1476748658'),
+       (13, '978-0393354324'),
        (14, '978-0767908184');
--- Bryson - Short History
 
 -- Geography books
 INSERT INTO author_book (author_id, book_isbn)
-VALUES (15, '978-0393352009'), -- Winchester - Map That Changed
-       (14, '978-0767903851'), -- Bryson - Sunburned Country
+VALUES (15, '978-0393352009'),
+       (14, '978-0767903851'),
        (14, '978-0062466686');
--- Bryson - Geography of Genius (actually Eric Weiner, but for demo)
 
--- =====================================================
--- SEED: Test Customer
--- =====================================================
-INSERT INTO customer (username, password, first_name, last_name, email, phone_number, shipping_address)
-VALUES ('testuser', 'test123', 'John', 'Doe', 'john.doe@example.com', '555-123-4567',
-        '123 Main Street, New York, NY 10001'),
-       ('janedoe', 'jane123', 'Jane', 'Doe', 'jane.doe@example.com', '555-987-6543',
-        '456 Oak Avenue, Los Angeles, CA 90001'),
-       ('bobsmith', 'bob123', 'Bob', 'Smith', 'bob.smith@example.com', NULL, '789 Pine Road, Chicago, IL 60601');
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+INSERT INTO customer (username, password, first_name, last_name, email, shipping_address, phone_number)
+VALUES
+    ('a', 'a', 'a', 'a', 'a@a.com', '101 A St, City A', '555-0001'),
+    ('b', 'b', 'b', 'b', 'b@b.com', '102 B St, City B', '555-0002'),
+    ('c', 'c', 'c', 'c', 'c@c.com', '103 C St, City C', '555-0003'),
+    ('d', 'd', 'd', 'd', 'd@d.com', '104 D St, City D', '555-0004'),
+    ('e', 'e', 'e', 'e', 'e@e.com', '105 E St, City E', '555-0005'),
+    ('f', 'f', 'f', 'f', 'f@f.com', '106 F St, City F', '555-0006');
+
+
+
+-- (Last 4 Months: Sep, Oct, Nov, Dec 2025)
+INSERT INTO "order" (order_id, customer_id, order_date) VALUES
+-- MONTH 1: September 2025 (Oldest)
+(1, 1, '2025-09-10'), -- Customer 'a' buys heavily
+(2, 2, '2025-09-15'), -- Customer 'b' buys
+
+-- MONTH 2: October 2025
+(3, 1, '2025-10-05'), -- Customer 'a' buys again
+(4, 3, '2025-10-12'), -- Customer 'c' buys
+(5, 4, '2025-10-20'), -- Customer 'd' buys
+
+-- MONTH 3: November 2025 (Previous Month for Reports)
+(6, 1, '2025-11-02'), -- Customer 'a' big purchase
+(7, 2, '2025-11-15'), -- Customer 'b'
+(8, 5, '2025-11-20'), -- Customer 'e' buys once
+
+-- MONTH 4: December 2025 (Current Month)
+(9, 1, '2025-12-05'), -- Customer 'a' recent purchase
+(10, 6, '2025-12-10'); -- Customer 'f' buys small item
+
+-- Reset order sequence so new orders don't crash
+SELECT setval('order_order_id_seq', (SELECT MAX(order_id) FROM "order"));
+
+
+-- Top Selling Book Strategy:
+-- '978-0062316097' (Sapiens) is bought frequently
+-- '978-3836562867' (Da Vinci) is expensive (boosts top customer stats)
+
+INSERT INTO order_book (order_id, book_isbn, quantity, price_at_purchase) VALUES
+-- Order 1 (Sep - Cust A)
+(1, '978-3836562867', 1, 59.99), -- Expensive Art Book
+(1, '978-0062316097', 2, 24.99), -- Sapiens (History)
+
+-- Order 2 (Sep - Cust B)
+(2, '978-0553380163', 1, 18.99), -- Brief History of Time
+
+-- Order 3 (Oct - Cust A)
+(3, '978-3836559591', 1, 49.99), -- Van Gogh (Expensive)
+(3, '978-0062316097', 1, 24.99), -- Sapiens again
+
+-- Order 4 (Oct - Cust C)
+(4, '978-0393609394', 3, 14.99), -- Astrophysics (Qty: 3)
+
+-- Order 5 (Oct - Cust D)
+(5, '978-0743226721', 1, 18.99), -- 1776
+
+-- Order 6 (Nov - Cust A - Previous Month Sale)
+(6, '978-3836562867', 2, 59.99), -- 2x Da Vinci ($120 purchase!)
+(6, '978-0345391469', 1, 18.99), -- History of God
+
+-- Order 7 (Nov - Cust B - Previous Month Sale)
+(7, '978-0062316097', 1, 24.99), -- Sapiens
+(7, '978-0393352009', 1, 16.99), -- Map That Changed the World
+
+-- Order 8 (Nov - Cust E - Previous Month Sale)
+(8, '978-0553380163', 1, 18.99), -- Brief History of Time
+
+-- Order 9 (Dec - Cust A)
+(9, '978-1476748658', 1, 22.99), -- Team of Rivals
+
+-- Order 10 (Dec - Cust F)
+(10, '978-0393609394', 1, 14.99); -- Astrophysics (Small purchase)
