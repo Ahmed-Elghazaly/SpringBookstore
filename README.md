@@ -1,38 +1,85 @@
-# 📚 Online Bookstore: Full-Stack Web Application
 
-A complete, production-ready online bookstore application featuring a robust Java Spring Boot backend, a React frontend, and a PostgreSQL database. The entire stack is containerized for seamless, one-command deployment.
+# 📚 GoldenBooks: Full-Stack E-Commerce Platform
+
+A production-ready, full-stack online bookstore application. Built with a robust Java Spring Boot REST API, a responsive React.js frontend, and an advanced PostgreSQL database. The entire ecosystem is containerized for seamless, one-command deployment.
 
 ---
 
 ## 🌟 Key Features
 
-* **Complete E-Commerce Flow:** Comprehensive management of books, user carts, order processing, authentication, and publisher inventory.
-* **Production-Grade Architecture:** Strictly enforces a layered architecture utilizing the DTO (Data Transfer Object) pattern, request/response mappers, and bean validation to ensure secure and clean data flow.
-* **Resilient Error Management:** Implements centralized, global exception handling via `@ControllerAdvice` to provide standardized, predictable REST API error responses.
-* **Containerized Deployment:** The entire ecosystem (Backend, Frontend, and Database) is orchestrated using Docker Compose, eliminating "it works on my machine" issues.
+### 🛡️ Backend Architecture (Spring Boot)
+* **Strict Layered Design:** Clean separation of concerns across Presentation (Controllers), Business (Services), and Data Access (Repositories) layers.
+* **Data Security & Integrity:** Utilizes the DTO (Data Transfer Object) pattern and Spring Boot Bean Validation to strictly control data entering and leaving the API.
+* **Global Error Handling:** Implements a centralized `@ControllerAdvice` architecture for standardized, predictable REST API error responses.
+* **Role-Based Access Control:** Distinct authentication flows and capabilities for `CUSTOMER` and `ADMIN` users.
 
----
+### 🗄️ Advanced Database Design (PostgreSQL)
+* **Automated Inventory Management:** Custom PL/pgSQL triggers (`prevent_negative_stock`, `auto_place_publisher_order`) automatically monitor thresholds and place pending restock orders when inventory drops.
+* **Real-Time Analytics:** Complex native SQL queries generate real-time reporting for top-spending customers, top-selling books, and temporal sales data.
+* **Data Integrity:** Strict foreign key constraints and cascading deletes ensure relational integrity across 9 interconnected tables.
 
-## 🏗️ System Architecture
-
-The backend is built with Spring Boot 4 and follows a strict layered design:
-
-* **Presentation Layer (8 REST Controllers):** Handles HTTP requests, enforces Bean Validation, and maps incoming JSON to internal models.
-* **Business Layer (6 Service Interfaces):** Encapsulates core e-commerce logic, transaction management, and validation rules.
-* **Data Access Layer (11 JPA Repositories):** Interfaces with PostgreSQL via Spring Data JPA/Hibernate for efficient, ORM-based data persistence.
+### 💻 Frontend Experience (React + Tailwind)
+* **Customer Portal:** Browse catalogs, dynamic multi-parameter search, shopping cart management, and order history tracking.
+* **Admin Dashboard:** Real-time analytics, inventory management, category/publisher configurations, and one-click publisher order fulfillment.
 
 ---
 
 ## 🚀 Quick Start (Docker)
 
-You can spin up the entire full-stack application with a single command. 
+The entire application is orchestrated using Docker Compose. No local Java or Node installations are required.
 
 ### Prerequisites
-* [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
+* [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/)
 
-### Installation
+### Installation & Deployment
 
-1. Clone the repository:
+1. **Clone the repository:**
    ```bash
    git clone [https://github.com/Ahmed-Elghazaly/bookstore.git](https://github.com/Ahmed-Elghazaly/bookstore.git)
    cd bookstore
+   ```
+
+2. **Boot the cluster:**
+   ```bash
+   docker-compose up -d --build
+   ```
+
+3. **Access the application:**
+   * **Frontend UI:** `http://localhost:3000` *(Served via Nginx)*
+   * **Backend API:** `http://localhost:8080/api`
+   * **Database:** `localhost:5432`
+
+*Note: The database is automatically seeded with mock data, publishers, and books on the first boot.*
+
+---
+
+## 🛠️ Tech Stack
+
+**Frontend**
+* React.js 18 (Vite)
+* Tailwind CSS
+* Lucide React (Icons)
+* Axios
+
+**Backend**
+* Java 21
+* Spring Boot (WebMVC, Data JPA, Validation)
+* Hibernate ORM
+
+**Database & Infrastructure**
+* PostgreSQL 18
+* Docker & Docker Compose
+* Nginx (Frontend Reverse Proxy)
+
+---
+
+## 👨‍💻 Default Test Accounts
+
+To explore the application without registering, use the pre-seeded test accounts:
+
+* **Admin Account:**
+  * Username: `admin`
+  * Password: `admin123`
+* **Customer Account:**
+  * Username: `a`
+  * Password: `a`
