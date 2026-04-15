@@ -36,7 +36,7 @@ The entire application is orchestrated using Docker Compose. No local Java or No
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/Ahmed-Elghazaly/SpringBookstore.git
-   cd springbookstore
+   cd SpringBookstore
    ```
 
 2. **Boot the cluster:**
